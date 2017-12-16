@@ -49,7 +49,7 @@ public class JpaConfig implements TransactionManagementConfigurer {
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(driver);
         if (IS_PROD) {
-            url = System.getenv("jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8");
+            url = "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8";
             username = System.getenv("MYSQL_USER");
             password = System.getenv("MYSQL_PASSWORD");
         }
