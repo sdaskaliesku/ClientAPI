@@ -14,10 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.client.support.web.*;
 
-@Controller
+//@Controller
 public class SignupController {
 
-    private static final String SIGNUP_VIEW_NAME = "signup/signup";
+    /*private static final String SIGNUP_VIEW_NAME = "signup/signup";
 
 	@Autowired
 	private UserService userService;
@@ -38,5 +38,5 @@ public class SignupController {
         // see /WEB-INF/i18n/messages.properties and /WEB-INF/views/homeSignedIn.html
         MessageHelper.addSuccessAttribute(ra, "signup.success");
 		return "redirect:/";
-	}
+	}*/
 }
