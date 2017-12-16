@@ -1,0 +1,27 @@
+package com.client.domain.enums;
+
+/**
+ * @author sdaskaliesku
+ */
+public enum Role {
+    ROLE_ADMIN("ROLE_ADMIN"), //0
+    ROLE_USER("ROLE_USER"); // 1
+
+    private String roleName;
+
+    Role(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getString() {
+        return super.toString().replace("ROLE_", "");
+    }
+}

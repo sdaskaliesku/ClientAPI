@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title th:text="#{view.index.title}">Welcome!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link href="../../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../../resources/css/jquery-ui.min.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/jquery-ui.min.css}"/>
+    <link href="../../../resources/css/jquery-ui.theme.min.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/jquery-ui.theme.min.css}"/>
+    <link href="../../../resources/css/jquery-ui.structure.min.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/jquery-ui.structure.min.css}"/>
+    <link href="../../../resources/css/themes/lightcolor/gray/jtable.min.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/themes/lightcolor/gray/jtable.min.css}"/>
+    <link href="../../../resources/css/validationEngine.jquery.css" rel="stylesheet" media="screen"
+          th:href="@{/resources/css/validationEngine.jquery.css}"/>
+    <link href="../../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}"/>
+    <script src="../../../resources/js/jquery-ui.min.js" th:src="@{/resources/js/jquery-ui.min.js}"></script>
+    <script src="../../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+    <script src="../../../resources/js/jquery.jtable.js" th:href="@{/resources/js/jquery.jtable.js}"></script>
+    <script src="../../../resources/js/jquery.jtable.min.js" th:href="@{/resources/js/jquery.jtable.min.js}"></script>
+    <script src="../../../resources/js/external/json2.min.js" th:href="@{/resources/js/external/json2.min.js}"></script>
+    <script src="../../../resources/js/localization/jquery.jtable.ru.js"
+            th:href="@{/resources/js/localization/jquery.jtable.ru.js}"></script>
+    <script src="../../../resources/js/jquery.validationEngine.js"
+            th:href="@{/resources/js/jquery.validationEngine.js}"></script>
+    <script src="../../../resources/js/jquery.validationEngine-en.js"
+            th:href="@{/resources/jquery.validationEngine-en.js}"></script>
+    <script src="../../../resources/js/main.js" th:href="@{/resources/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="fragments/header :: header">&nbsp;</div>
+<div class="container">
+    <th:block th:if="${message != null}">
+        <div th:replace="fragments/alert :: alert (type=${#strings.toLowerCase(message.type)}, message=#{${message.message}(${#authentication.name})})">
+            &nbsp;</div>
+    </th:block>
+    <div class='tab-content'>
+        <div class='tab-pane' id="clan">
+            <div id="clanContainer"></div>
+        </div>
+        <div class='tab-pane' id="personal">
+            <div id="personalContainer"></div>
+        </div>
+        <div class='tab-pane' id="blackList">
+            <div id="blackListContainer"></div>
+        </div>
+        <div class='tab-pane' id="versions">
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <div id="versionContainer"></div>
+            </div>
+        </div>
+        <div class='tab-pane' id="logs">
+            <div id="logsContainer"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
