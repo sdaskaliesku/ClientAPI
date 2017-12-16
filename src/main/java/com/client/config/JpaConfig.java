@@ -42,10 +42,17 @@ public class JpaConfig implements TransactionManagementConfigurer {
     @Value("${hibernate.format_sql}")
     private String formatSql;
 
+    private static final boolean IS_PROD = true;
+
     @Bean
     public DataSource configureDataSource() {
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(driver);
+        if (IS_PROD) {
+            url = System.getenv("jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8");
+            username = System.getenv("MYSQL_USER");
+            password = System.getenv("MYSQL_PASSWORD");
+        }
         config.setJdbcUrl(url);
         config.setUsername(username);
         config.setPassword(password);
