@@ -25,6 +25,10 @@ import com.client.Application;
 @EnableJpaRepositories(basePackageClasses = Application.class)
 public class JpaConfig implements TransactionManagementConfigurer {
 
+    private static final String DB_USERNAME = "userNQX";
+    private static final String DB_PASSWORD = "ctsRX0Ao52bS6yiv";
+    private static final String DB_URL = "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8";
+
     @Value("${dataSource.driverClassName}")
     private String driver;
     @Value("${dataSource.url}")
@@ -41,17 +45,17 @@ public class JpaConfig implements TransactionManagementConfigurer {
     private String showSql;
     @Value("${hibernate.format_sql}")
     private String formatSql;
-
-    private static final boolean IS_PROD = true;
+    @Value("${dataSource.isProd}")
+    private boolean isProd;
 
     @Bean
     public DataSource configureDataSource() {
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(driver);
-        if (IS_PROD) {
-            url = "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8";
-            username = System.getenv("MYSQL_USER");
-            password = System.getenv("MYSQL_PASSWORD");
+        if (isProd) {
+            url = DB_URL;
+            username = DB_USERNAME;
+            password = DB_PASSWORD;
         }
         config.setJdbcUrl(url);
         config.setUsername(username);
