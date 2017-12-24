@@ -60,7 +60,7 @@ public class AccessListApiController extends ApiController {
         try {
             log.info("New activate request: {}", activateRequest);
             // log request to db
-            activateRequestService.create(activateRequest);
+//            activateRequestService.create(activateRequest);
             if (blackListService.isClanInBlackList(activateRequest.getClanName())) {
                 // access denied
                 response.setAccessType(AccessType.Denied);

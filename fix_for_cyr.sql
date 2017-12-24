@@ -1,0 +1,1 @@
+SET NAMES utf8mb4;ALTER TABLE ClientVersion CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;ALTER TABLE ClientVersion DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;ALTER TABLE ClientVersion CHANGE releaseNotes releaseNotes VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci;
