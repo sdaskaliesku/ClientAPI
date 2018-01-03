@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author sdaskaliesku
@@ -47,6 +49,16 @@ public class AccessListApiController extends ApiController {
         throw new NotSupportedException();
     }
 
+    private ActivateRequest getActivateRequestToLog(ActivateRequest activateRequest) {
+        if (Objects.nonNull(activateRequest)) {
+            List<ActivateRequest> list = activateRequestService.read();
+            if (list.stream().noneMatch(x -> Objects.nonNull(x.getClanName()) && Objects.nonNull(x.getNickName()) && x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) || x.getNickName().equalsIgnoreCase(activateRequest.getNickName()))) {
+                return activateRequest;
+            }
+        }
+        return null;
+    }
+
     @Override
     @ResponseBody
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
@@ -60,7 +72,10 @@ public class AccessListApiController extends ApiController {
         try {
             log.info("New activate request: {}", activateRequest);
             // log request to db
-//            activateRequestService.create(activateRequest);
+            ActivateRequest requestToLog = getActivateRequestToLog(activateRequest);
+            if (Objects.nonNull(requestToLog)) {
+                activateRequestService.create(activateRequest);
+            }
             if (blackListService.isClanInBlackList(activateRequest.getClanName())) {
                 // access denied
                 response.setAccessType(AccessType.Denied);
