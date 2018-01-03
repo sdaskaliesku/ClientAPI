@@ -31,8 +31,8 @@ public class ActivateRequestController extends CRUDController<ActivateRequest> {
         return response;
     }
 
-    @Override
+    /*@Override
     public Response delete(Long id) {
         return response;
-    }
+    }*/
 }

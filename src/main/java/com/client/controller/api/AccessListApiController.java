@@ -57,7 +57,7 @@ public class AccessListApiController extends ApiController {
 //                    filter out just null names, not empty
                     .filter(x -> Objects.nonNull(x.getClanName()))
                     .filter(x -> Objects.nonNull(x.getNickName()))
-                    .noneMatch(x -> x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) && x.getNickName().equalsIgnoreCase(activateRequest.getNickName()))) {
+                    .noneMatch(x -> x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) && x.getNickName().equalsIgnoreCase(activateRequest.getNickName()) && x.getClientVersion().equals(activateRequest.getClientVersion()))) {
                 return activateRequest;
             }
         }

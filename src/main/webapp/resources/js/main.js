@@ -240,10 +240,10 @@ $(document).ready(function () {
         ajaxSettings: {type: 'GET'},
         title: 'Logs',
         actions: {
-            listAction: '/crud/activateRequest/read'
-            //createAction: '/crud/clientVersion/create',
-            //updateAction: '/crud/clientVersion/update',
-            //deleteAction: '/crud/clientVersion/delete'
+            listAction: '/crud/activateRequest/read',
+            //createAction: '/crud/activateRequest/create',
+            //updateAction: '/crud/activateRequest/update',
+            deleteAction: '/crud/activateRequest/delete'
         },
         fields: {
             id: {
