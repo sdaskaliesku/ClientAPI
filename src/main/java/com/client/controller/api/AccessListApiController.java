@@ -52,7 +52,12 @@ public class AccessListApiController extends ApiController {
     private ActivateRequest getActivateRequestToLog(ActivateRequest activateRequest) {
         if (Objects.nonNull(activateRequest)) {
             List<ActivateRequest> list = activateRequestService.read();
-            if (list.stream().noneMatch(x -> Objects.nonNull(x.getClanName()) && Objects.nonNull(x.getNickName()) && x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) || x.getNickName().equalsIgnoreCase(activateRequest.getNickName()))) {
+            if (list.stream()
+                    .filter(Objects::nonNull)
+//                    filter out just null names, not empty
+                    .filter(x -> Objects.nonNull(x.getClanName()))
+                    .filter(x -> Objects.nonNull(x.getNickName()))
+                    .noneMatch(x -> x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) && x.getNickName().equalsIgnoreCase(activateRequest.getNickName()))) {
                 return activateRequest;
             }
         }
