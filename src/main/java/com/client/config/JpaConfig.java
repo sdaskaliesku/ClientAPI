@@ -3,7 +3,6 @@ package com.client.config;
 import com.client.Application;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,29 +16,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import javax.sql.DataSource;
-import java.net.URI;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackageClasses = Application.class)
 public class JpaConfig implements TransactionManagementConfigurer {
 
-    private static final String DB_USERNAME = "userNQX";
-    private static final String DB_PASSWORD = "ctsRX0Ao52bS6yiv";
-    private static final String DB_URL = "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8";
+    private static final DBConfig OPEN_SHIFT_CONFIG = new DBConfig("com.mysql.jdbc.Driver", "org.hibernate.dialect.MySQL5InnoDBDialect", "userNQX", "ctsRX0Ao52bS6yiv", "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8");
+    private static final DBConfig LOCAL_CONFIG = new DBConfig("com.mysql.jdbc.Driver", "org.hibernate.dialect.MySQL5InnoDBDialect", "root", "", "jdbc:mysql://localhost/neolands?useUnicode=true&characterEncoding=utf8");
+    private static final DBConfig HEROKU_CONFIG = DBConfig.getHerokuConfig();
 
-    @Value("${dataSource.driverClassName}")
-    private String driver;
-    @Value("${dataSource.url}")
-    private String url;
-    @Value("${dataSource.username}")
-    private String username;
-    @Value("${dataSource.password}")
-    private String password;
-    @Value("${hibernate.dialect}")
-    private String dialect;
     @Value("${hibernate.hbm2ddl.auto}")
     private String hbm2ddlAuto;
     @Value("${hibernate.show_sql}")
@@ -49,45 +38,35 @@ public class JpaConfig implements TransactionManagementConfigurer {
     @Value("${dataSource.isProd}")
     private boolean isProd;
 
-    private static boolean isHeroku() {
-        return StringUtils.isNotEmpty(System.getenv("DATABASE_URL"));
-    }
-
-    private static URI getHerokuUrl() {
-        try {
-            return new URI(System.getenv("DATABASE_URL"));
-        } catch (Exception e) {
-            return null;
+    private DBConfig getDBConfig() {
+        if (isProd) {
+            if (DBConfig.isHeroku() && Objects.nonNull(HEROKU_CONFIG)) {
+                return HEROKU_CONFIG;
+            }
+            return OPEN_SHIFT_CONFIG;
         }
+        return LOCAL_CONFIG;
     }
 
     @Bean
     public DataSource configureDataSource() {
         HikariConfig config = new HikariConfig();
-        config.setDriverClassName(driver);
-        if (isProd) {
-            url = DB_URL;
-            username = DB_USERNAME;
-            password = DB_PASSWORD;
-        }
-        if (isHeroku()) {
-            URI dbUri = getHerokuUrl();
-            if (Objects.nonNull(dbUri)) {
-                username = dbUri.getUserInfo().split(":")[0];
-                password = dbUri.getUserInfo().split(":")[1];
-                url = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-            }
-        }
-        config.setJdbcUrl(url);
-        config.setUsername(username);
-        config.setPassword(password);
+        DBConfig dbConfig = getDBConfig();
+        System.out.println("Using DB config: " + dbConfig.toString());
+        config.setDriverClassName(dbConfig.getDriver());
+
+        config.setJdbcUrl(dbConfig.getUrl());
+        config.setUsername(dbConfig.getUsername());
+        config.setPassword(dbConfig.getPassword());
         config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("useServerPrepStmts", "true");
 
-        return new HikariDataSource(config);
+        HikariDataSource dataSource = new HikariDataSource(config);
+        dataSource.setMaxLifetime(TimeUnit.SECONDS.toMillis(30L));
+        return dataSource;
     }
 
     @Bean
@@ -98,7 +77,7 @@ public class JpaConfig implements TransactionManagementConfigurer {
         entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties jpaProperties = new Properties();
-        jpaProperties.put(Environment.DIALECT, dialect);
+        jpaProperties.put(Environment.DIALECT, getDBConfig().getDialect());
         jpaProperties.put(Environment.HBM2DDL_AUTO, hbm2ddlAuto);
         jpaProperties.put(Environment.SHOW_SQL, showSql);
         jpaProperties.put(Environment.FORMAT_SQL, formatSql);
