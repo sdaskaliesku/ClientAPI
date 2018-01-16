@@ -58,15 +58,13 @@ public class JpaConfig implements TransactionManagementConfigurer {
         config.setJdbcUrl(dbConfig.getUrl());
         config.setUsername(dbConfig.getUsername());
         config.setPassword(dbConfig.getPassword());
-        config.setConnectionTestQuery("SELECT 1");
+//        config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("useServerPrepStmts", "true");
 
-        HikariDataSource dataSource = new HikariDataSource(config);
-        dataSource.setMaxLifetime(TimeUnit.SECONDS.toMillis(30L));
-        return dataSource;
+        return new HikariDataSource(config);
     }
 
     @Bean
