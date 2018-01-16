@@ -1,11 +1,9 @@
 package com.client.config;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
+import com.client.Application;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +16,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import com.client.Application;
+import javax.sql.DataSource;
+import java.net.URI;
+import java.util.Objects;
+import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
@@ -48,6 +49,18 @@ public class JpaConfig implements TransactionManagementConfigurer {
     @Value("${dataSource.isProd}")
     private boolean isProd;
 
+    private static boolean isHeroku() {
+        return StringUtils.isNotEmpty(System.getenv("DATABASE_URL"));
+    }
+
+    private static URI getHerokuUrl() {
+        try {
+            return new URI(System.getenv("DATABASE_URL"));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Bean
     public DataSource configureDataSource() {
         HikariConfig config = new HikariConfig();
@@ -56,6 +69,14 @@ public class JpaConfig implements TransactionManagementConfigurer {
             url = DB_URL;
             username = DB_USERNAME;
             password = DB_PASSWORD;
+        }
+        if (isHeroku()) {
+            URI dbUri = getHerokuUrl();
+            if (Objects.nonNull(dbUri)) {
+                username = dbUri.getUserInfo().split(":")[0];
+                password = dbUri.getUserInfo().split(":")[1];
+                url = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+            }
         }
         config.setJdbcUrl(url);
         config.setUsername(username);
