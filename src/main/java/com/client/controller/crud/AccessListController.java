@@ -3,6 +3,7 @@ package com.client.controller.crud;
 import com.client.domain.db.AccessList;
 import com.client.domain.responses.Response;
 import com.client.service.AccessListService;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping("/crud/accessList")
+@Secured({ "ROLE_USER", "ROLE_ADMIN" })
 public class AccessListController extends CRUDController<AccessList> {
 
     @ResponseBody

@@ -3,6 +3,7 @@ package com.client.controller.crud;
 import com.client.domain.responses.Response;
 import com.client.service.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author sdaskaliesku
  */
 @Controller
+@Secured({ "ROLE_USER", "ROLE_ADMIN" })
 public abstract class CRUDController<T> {
 
     @Autowired
@@ -33,11 +35,12 @@ public abstract class CRUDController<T> {
     /**
      * Response should be in format: {"Result":"OK", "Records":[{...},...]}
      * Or {"Result":"ERROR", "Message":""}
+     *
      * @return list of objects as json
      */
     @ResponseBody
     @RequestMapping(value = "/read", method = RequestMethod.GET)
-    public  Response read() {
+    public Response read() {
         Response Response = new Response();
         List<T> result = service.read();
         Response.setRecords(result);

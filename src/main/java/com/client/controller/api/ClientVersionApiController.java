@@ -74,6 +74,11 @@ public class ClientVersionApiController extends ApiController {
     }
 
     @Override
+    public String activate(HttpServletRequest httpServletRequest) {
+        return null;
+    }
+
+    @Override
     public Response activate(@Valid @ModelAttribute ActivateRequest activateRequest, HttpServletRequest request) throws Exception {
         throw new NotSupportedException();
     }

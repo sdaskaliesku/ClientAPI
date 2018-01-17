@@ -1,6 +1,7 @@
 package com.client.domain.db;
 
 import com.client.domain.enums.AccessType;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -57,8 +59,12 @@ public class ActivateRequest implements Serializable {
     @Column
     private AccessType accessType;
 
+    @Transient
+    private String millis;
+
     public ActivateRequest() {
         this.date = new Date(new java.util.Date().getTime());
+        this.millis = String.valueOf(System.currentTimeMillis());
     }
 
     public Long getId() {
@@ -141,19 +147,28 @@ public class ActivateRequest implements Serializable {
         this.accessType = accessType;
     }
 
+    public String getMillis() {
+        return millis;
+    }
+
+    public void setMillis(String millis) {
+        this.millis = millis;
+    }
+
     @Override
     public String toString() {
-        return "ActivateRequest{" +
-                "id=" + id +
-                ", date=" + date +
-                ", nickName='" + nickName + '\'' +
-                ", clanName='" + clanName + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
-                ", macAddress='" + macAddress + '\'' +
-                ", clientVersion=" + clientVersion +
-                ", activated=" + activated +
-                ", isBetta=" + isBetta +
-                ", accessType=" + accessType +
-                '}';
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("date", date)
+                .append("nickName", nickName)
+                .append("clanName", clanName)
+                .append("ipAddress", ipAddress)
+                .append("macAddress", macAddress)
+                .append("clientVersion", clientVersion)
+                .append("activated", activated)
+                .append("isBetta", isBetta)
+                .append("accessType", accessType)
+                .append("millis", millis)
+                .toString();
     }
 }

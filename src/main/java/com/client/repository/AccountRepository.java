@@ -1,14 +1,12 @@
 package com.client.repository;
 
-import javax.persistence.*;
-import javax.inject.Inject;
-
 import com.client.domain.db.Account;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import java.util.List;
 
 @Repository
@@ -29,9 +27,8 @@ public class AccountRepository extends AbstractRepository<Account> {
     }
 
     @Override
-    @Deprecated
     public List<Account> getAll() {
-        throw new NotYetImplementedException();
+        return entityManager.createNamedQuery(Account.FIND_ALL, Account.class).getResultList();
     }
 
     @Override

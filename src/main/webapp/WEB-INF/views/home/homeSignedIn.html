@@ -35,9 +35,10 @@
 <div class="container">
     <th:block th:if="${message != null}">
         <div th:replace="fragments/alert :: alert (type=${#strings.toLowerCase(message.type)}, message=#{${message.message}(${#authentication.name})})">
-            &nbsp;</div>
+            &nbsp;
+        </div>
     </th:block>
-    <div class='tab-content'>
+    <div class='tab-content' sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
         <div class='tab-pane' id="clan">
             <div id="clanContainer"></div>
         </div>
@@ -54,6 +55,11 @@
         </div>
         <div class='tab-pane' id="logs">
             <div id="logsContainer"></div>
+        </div>
+        <div class='tab-pane' id="users">
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <div id="usersContainer"></div>
+            </div>
         </div>
     </div>
 </div>

@@ -9,9 +9,11 @@ import com.client.domain.enums.VersionCheckResult;
 import com.client.domain.responses.ActivateResponse;
 import com.client.domain.responses.Response;
 import com.client.utils.DateUtils;
+import com.client.utils.EncodeUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,7 @@ import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author sdaskaliesku
@@ -49,25 +52,36 @@ public class AccessListApiController extends ApiController {
         throw new NotSupportedException();
     }
 
-    private ActivateRequest getActivateRequestToLog(ActivateRequest activateRequest) {
-        if (Objects.nonNull(activateRequest)) {
-            List<ActivateRequest> list = activateRequestService.read();
-            if (list.stream()
-                    .filter(Objects::nonNull)
-//                    filter out just null names, not empty
-                    .filter(x -> Objects.nonNull(x.getClanName()))
-                    .filter(x -> Objects.nonNull(x.getNickName()))
-                    .noneMatch(x -> x.getClanName().equalsIgnoreCase(activateRequest.getClanName()) && x.getNickName().equalsIgnoreCase(activateRequest.getNickName()) && x.getClientVersion().equals(activateRequest.getClientVersion()))) {
-                return activateRequest;
+    private Optional<ActivateRequest> findActivateRequest(ActivateRequest activateRequest) {
+        List<ActivateRequest> activateRequests = activateRequestService.read();
+        for (ActivateRequest request : activateRequests) {
+            if (request.getNickName().equalsIgnoreCase(activateRequest.getNickName())) {
+                activateRequest.setId(request.getId());
+                return Optional.of(activateRequest);
             }
         }
-        return null;
+        return Optional.empty();
+    }
+
+    private void logLastUserActivateRequest(ActivateRequest activateRequest) {
+        Optional<ActivateRequest> opt = findActivateRequest(activateRequest);
+        if (opt.isPresent()) {
+            activateRequestService.update(opt.get());
+        } else {
+            activateRequestService.create(activateRequest);
+        }
     }
 
     @Override
+    @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
-    @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    public ActivateResponse activate(@Valid @ModelAttribute ActivateRequest activateRequest, HttpServletRequest request) {
+    public String activate(HttpServletRequest httpServletRequest) {
+        ActivateRequest activateRequest = EncodeUtils.decode(httpServletRequest.getParameter("request"), ActivateRequest.class);
+        return EncodeUtils.encode(activate(activateRequest, httpServletRequest));
+    }
+
+    @Override
+    public ActivateResponse activate(ActivateRequest activateRequest, HttpServletRequest request) {
         try {
             activateRequest.setIpAddress(getIpAddress(request));
         } catch (Exception e) {
@@ -77,37 +91,38 @@ public class AccessListApiController extends ApiController {
         try {
             log.info("New activate request: {}", activateRequest);
             // log request to db
-            ActivateRequest requestToLog = getActivateRequestToLog(activateRequest);
-            if (Objects.nonNull(requestToLog)) {
-                activateRequestService.create(activateRequest);
-            }
-            if (blackListService.isClanInBlackList(activateRequest.getClanName())) {
+            logLastUserActivateRequest(activateRequest);
+
+            boolean isClanInBlackList = blackListService.isClanInBlackList(activateRequest.getClanName());
+            boolean isUserInBlackList = blackListService.isUserInBlackList(activateRequest.getNickName());
+            if (isClanInBlackList || isUserInBlackList) {
                 // access denied
                 response.setAccessType(AccessType.Denied);
-                response.setMessage("Clan is banned!");
-                return response;
-            }
-            if (blackListService.isUserInBlackList(activateRequest.getNickName())) {
-                // access denied
-                response.setAccessType(AccessType.Denied);
-                response.setMessage("User is banned!");
+                if (isClanInBlackList) {
+                    response.setMessage("Clan is banned!");
+                } else {
+                    response.setMessage("User is banned!");
+                }
                 return response;
             }
             boolean isVersionBanned = clientVersionService
                     .isVersionBanned(activateRequest.getClientVersion(), activateRequest.getBetta());
-            if (isVersionBanned) {
-                ClientVersion clientVersion = clientVersionService.getLastVersion(activateRequest.getBetta());
-                // required update
-                response.setRecord(clientVersion.getLink());
-                response.setVersionCheckResult(VersionCheckResult.Required);
-                response.setAccessType(AccessType.Denied);
-                response.setMessage("Client version is banned, please update!");
-                return response;
+            ClientVersion clientVersion = clientVersionService.getLastVersion(activateRequest.getBetta());
+            if (Objects.nonNull(clientVersion)) {
+                response.setUrlForUpdate(clientVersion.getLink());
+                response.setReleaseNotes(clientVersion.getReleaseNotes());
+                if (isVersionBanned) {
+                    // required update
+                    response.setVersionCheckResult(VersionCheckResult.Required);
+                    response.setAccessType(AccessType.Denied);
+                    response.setMessage("Client version is banned, please update!");
+                    return response;
+                }
             }
 
             AccessList accessList = accessListService.getAccessByClanOrUserName(activateRequest.getNickName(),
                     activateRequest.getClanName());
-            if (accessList != null) {
+            if (Objects.nonNull(accessList)) {
                 if (response.getAccessType() != AccessType.Denied) {
                     if (DateUtils.isDateEqualOrBeforeToday(accessList.getDueDate())) {
                         response.setAccessType(accessList.getAccessType());
@@ -120,28 +135,26 @@ public class AccessListApiController extends ApiController {
                     response.setAccessEndDate(accessList.getDueDate());
                     response.setClanAccess(accessList.getClan());
                 }
-            } /*else {
-                // TODO: do this jmx-able - first time use - free period
-                if (!isClanInBlackList && !isUserInBlackList && !isVersionBanned) {
-                    if (allowFreeFirstTimeUsage) {
-                        AccessList newAccess = new AccessList();
-                        newAccess.setAccessType(AccessType.Basic);
-                        newAccess.setClanAccess(false);
-                        newAccess.setClan(false);
-                        newAccess.setName(activateRequest.getNickName());
-                        newAccess.setDueDate(DateUtils.addDay(freeDaysPeriod));
-                        newAccess.setComments("Auto created free access account for '"
-                                + activateRequest.getNickName() + "' from " + DATE_FORMAT.format(newAccess.getFromDate())
-                                + " due " + DATE_FORMAT.format(newAccess.getDueDate()));
-                        accessListService.create(newAccess);
-                        response.setAccessType(AccessType.Basic);
-                        response.setAccessEndDate(newAccess.getDueDate());
-                    }
+            } else {
+                if (allowFreeFirstTimeUsage) {
+                    AccessList newAccess = new AccessList();
+                    newAccess.setAccessType(AccessType.Basic);
+                    newAccess.setClanAccess(false);
+                    newAccess.setClan(false);
+                    newAccess.setName(activateRequest.getNickName());
+                    newAccess.setDueDate(DateUtils.addDay(freeDaysPeriod));
+                    newAccess.setComments("Auto created free access account for '"
+                            + activateRequest.getNickName() + "' from " + DATE_FORMAT.format(newAccess.getFromDate())
+                            + " due " + DATE_FORMAT.format(newAccess.getDueDate()));
+                    accessListService.create(newAccess);
+                    response.setAccessType(AccessType.Basic);
+                    response.setAccessEndDate(newAccess.getDueDate());
                 }
-            }*/
+            }
             log.info("Activate response: {}", response);
         } catch (Exception e) {
             response.setRecord(e);
+            log.error("Error activating", e);
         }
         return response;
     }

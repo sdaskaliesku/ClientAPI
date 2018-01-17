@@ -46,11 +46,17 @@ public class ClientVersionRepository extends AbstractRepository<ClientVersion> {
     }
 
     public ClientVersion getClientVersion(double version, boolean isBetta) {
-        return entityManager.createNamedQuery(ClientVersion.GET_VERSION_BY_VERSION_AND_BETTA, ClientVersion.class)
-                .setParameter("isBetta", isBetta)
-                .setParameter("version", version)
-                .setParameter("isBanned", USE_BANNED_VERSIONS)
-                .getSingleResult();
+        try {
+            return entityManager.createNamedQuery(ClientVersion.GET_VERSION_BY_VERSION_AND_BETTA, ClientVersion.class)
+                    .setParameter("isBetta", isBetta)
+                    .setParameter("version", version)
+                    .setParameter("isBanned", USE_BANNED_VERSIONS)
+                    .getSingleResult();
+
+        } catch (Exception e) {
+
+        }
+        return null;
     }
 
     public ClientVersion getLastVersion(boolean isBetta) {

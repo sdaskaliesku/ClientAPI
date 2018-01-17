@@ -2,6 +2,7 @@ package com.client.controller.crud;
 
 import com.client.domain.db.ActivateRequest;
 import com.client.domain.responses.Response;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/crud/activateRequest")
+@Secured({ "ROLE_USER", "ROLE_ADMIN" })
 public class ActivateRequestController extends CRUDController<ActivateRequest> {
 
     private Response response;

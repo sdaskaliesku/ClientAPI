@@ -6,10 +6,12 @@ import com.client.domain.enums.VersionCheckResult;
 import com.client.domain.enums.UpdatePolicy;
 import com.client.repository.ClientVersionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author sdaskaliesku
@@ -63,7 +65,11 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
     }
 
     public ClientVersion getLastVersion(boolean allowBetta) {
-        return getClientVersionsByType(allowBetta).get(0);
+        List<ClientVersion> versions = getClientVersionsByType(allowBetta);
+        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(versions)) {
+            return versions.get(0);
+        }
+        return new ClientVersion();
     }
 
     public VersionCheckResult getUpdateCheckResult(UpdateRequest request, ClientVersion lastVersion) {
@@ -72,7 +78,7 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
         Boolean allowBetta = request.getUpdateToBeta();
         VersionCheckResult result = VersionCheckResult.Optional;
         ClientVersion current = getClientVersion(version, isBetta);
-        if (current.getBanned()) {
+        if (Objects.nonNull(current) && current.getBanned()) {
             result = VersionCheckResult.Required;
             return result;
         }

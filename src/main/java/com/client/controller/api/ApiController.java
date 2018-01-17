@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +30,7 @@ import java.text.SimpleDateFormat;
 public abstract class ApiController {
 
     protected final Logger log = LoggerFactory.getLogger(AccessListApiController.class);
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+    protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
     // TODO: do this jmx-able
     protected Boolean allowFreeFirstTimeUsage = false;
@@ -63,9 +64,11 @@ public abstract class ApiController {
     @RequestMapping(value = "/getAllVersions", method = RequestMethod.GET)
     public abstract Response getAllVersions() throws Exception;
 
+    @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
-    @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    public abstract Response activate(@Valid @ModelAttribute ActivateRequest activateRequest, HttpServletRequest request) throws Exception;
+    public abstract String activate(HttpServletRequest httpServletRequest);
+
+    public abstract Response activate(ActivateRequest activateRequest, HttpServletRequest request) throws Exception;
 
     public void setClientVersionService(ClientVersionService clientVersionService) {
         this.clientVersionService = clientVersionService;

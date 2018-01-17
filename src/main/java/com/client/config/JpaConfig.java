@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableTransactionManagement
@@ -52,13 +51,10 @@ public class JpaConfig implements TransactionManagementConfigurer {
     public DataSource configureDataSource() {
         HikariConfig config = new HikariConfig();
         DBConfig dbConfig = getDBConfig();
-        System.out.println("Using DB config: " + dbConfig.toString());
         config.setDriverClassName(dbConfig.getDriver());
-
         config.setJdbcUrl(dbConfig.getUrl());
         config.setUsername(dbConfig.getUsername());
         config.setPassword(dbConfig.getPassword());
-//        config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

@@ -33,6 +33,6 @@ public class SignupRequest {
     }
 
     public Account createAccount() {
-        return new Account(getName(), getPassword(), Role.ROLE_USER);
+        return new Account(getName(), getPassword(), Role.ROLE_NOTHING);
     }
 }

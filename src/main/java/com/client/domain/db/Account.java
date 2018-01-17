@@ -8,10 +8,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "Account")
-@NamedQuery(name = Account.FIND_BY_NAME, query = "select a from Account a where a.name = :name")
+@NamedQueries({
+        @NamedQuery(name = Account.FIND_BY_NAME, query = "select a from Account a where a.name = :name"),
+        @NamedQuery(name = Account.FIND_ALL, query = "select a from Account a")
+})
 public class Account implements java.io.Serializable {
 
     public static final String FIND_BY_NAME = "Account.findByName";
+    public static final String FIND_ALL = "Account.findAll";
 
     @Id
     @GeneratedValue
@@ -23,10 +27,10 @@ public class Account implements java.io.Serializable {
     @JsonIgnore
     private String password;
 
-    private Role role = Role.ROLE_ADMIN;
+    private Role role;
 
     public Account() {
-
+        role = Role.ROLE_NOTHING;
     }
 
     public Account(String name, String password, Role role) {

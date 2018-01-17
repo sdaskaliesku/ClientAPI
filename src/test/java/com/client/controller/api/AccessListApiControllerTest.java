@@ -101,7 +101,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         activateRequest = getTestActivateRequest(clanName, nickName);
         response = getActivateResponse(activateRequest, request);
         assertNotNull(response);
-        assertEquals(response.getAccessType(), AccessType.Basic);
+        assertEquals(AccessType.Basic, response.getAccessType());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         activateRequest = getTestActivateRequest(clanName, nickName);
         response = getActivateResponse(activateRequest, request);
         assertNotNull(response);
-        assertEquals(response.getAccessType(), AccessType.Pro);
+        assertEquals(AccessType.Pro, response.getAccessType());
         assertEquals(response.getAccessEndDate(), lastDate);
 
     }
@@ -199,7 +199,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         activateRequest = getTestActivateRequest(clanName, nickName);
         response = getActivateResponse(activateRequest, request);
         assertNotNull(response);
-        assertEquals(response.getAccessType(), AccessType.Denied);
+        assertEquals(AccessType.Denied, response.getAccessType());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         activateRequest = getTestActivateRequest(clanName, nickName);
         response = getActivateResponse(activateRequest, request);
         assertNotNull(response);
-        assertEquals(response.getAccessType(), AccessType.Denied);
+        assertEquals(AccessType.Denied, response.getAccessType());
     }
 
     @Test
@@ -357,7 +357,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         activateRequest = getTestActivateRequest(clanName, nickName);
         response = getActivateResponse(activateRequest, request);
         assertNotNull(response);
-        assertEquals(response.getAccessType(), AccessType.Basic);
+        assertEquals(AccessType.Basic, response.getAccessType());
         String endDate = ApiController.getDateFormat().format(response.getAccessEndDate());
         String expectedEndDate = ApiController.getDateFormat().format(lastDate);
         assertEquals(expectedEndDate, endDate);

@@ -4,6 +4,7 @@ import com.client.domain.enums.AccessType;
 import com.client.domain.enums.VersionCheckResult;
 import com.client.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
 
@@ -19,12 +20,18 @@ public class ActivateResponse extends Response {
     private Boolean isClanAccess;
     private String clanName;
     private String nickname;
+    private String urlForUpdate;
+    private String releaseNotes;
+    private String millis;
 
     public ActivateResponse() {
         accessType = AccessType.NoAccess;
         versionCheckResult = VersionCheckResult.UpToDate;
         accessEndDate = DateUtils.getCurrentDate();
+        urlForUpdate = StringUtils.EMPTY;
+        releaseNotes = StringUtils.EMPTY;
         isClanAccess = false;
+        this.millis = String.valueOf(System.currentTimeMillis());
     }
 
     public AccessType getAccessType() {
@@ -73,5 +80,29 @@ public class ActivateResponse extends Response {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getUrlForUpdate() {
+        return urlForUpdate;
+    }
+
+    public void setUrlForUpdate(String urlForUpdate) {
+        this.urlForUpdate = urlForUpdate;
+    }
+
+    public String getReleaseNotes() {
+        return releaseNotes;
+    }
+
+    public void setReleaseNotes(String releaseNotes) {
+        this.releaseNotes = releaseNotes;
+    }
+
+    public String getMillis() {
+        return millis;
+    }
+
+    public void setMillis(String millis) {
+        this.millis = millis;
     }
 }

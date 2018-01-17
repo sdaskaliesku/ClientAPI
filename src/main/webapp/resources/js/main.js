@@ -8,8 +8,26 @@ $(document).ready(function () {
     var blackListContainer = $('#blackListContainer');
     var versionContainer = $('#versionContainer');
     var logsContainer = $('#logsContainer');
+    var usersContainer = $('#usersContainer');
 
-    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer];
+    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer, usersContainer];
+
+    //Initialize validation logic when a form is created
+    function formCreated(event, data) {
+        data.form.validationEngine('hide');
+        data.form.validationEngine('detach');
+    }
+
+    //Validate form when it is being submitted
+    function formSubmitting(event, data) {
+        return data.form.validationEngine('validate');
+    }
+
+    //Dispose validation logic when form is closed
+    function formClosed(event, data) {
+        data.form.validationEngine('hide');
+        data.form.validationEngine('detach');
+    }
 
     clanContainer.jtable({
         jqueryuiTheme: true,
@@ -55,19 +73,10 @@ $(document).ready(function () {
                 defaultValue: ''
             }
         },
-        //Initialize validation logic when a form is created
-        formCreated: function (event, data) {
-            data.form.validationEngine();
-        },
-        //Validate form when it is being submitted
-        formSubmitting: function (event, data) {
-            return data.form.validationEngine('validate');
-        },
-        //Dispose validation logic when form is closed
-        formClosed: function (event, data) {
-            data.form.validationEngine('hide');
-            data.form.validationEngine('detach');
-        }
+
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
     });
 
     personalContainer.jtable({
@@ -114,19 +123,9 @@ $(document).ready(function () {
                 defaultValue: ''
             }
         },
-        //Initialize validation logic when a form is created
-        formCreated: function (event, data) {
-            data.form.validationEngine();
-        },
-        //Validate form when it is being submitted
-        formSubmitting: function (event, data) {
-            return data.form.validationEngine('validate');
-        },
-        //Dispose validation logic when form is closed
-        formClosed: function (event, data) {
-            data.form.validationEngine('hide');
-            data.form.validationEngine('detach');
-        }
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
     });
 
     blackListContainer.jtable({
@@ -159,19 +158,9 @@ $(document).ready(function () {
                 defaultValue: true
             }
         },
-        //Initialize validation logic when a form is created
-        formCreated: function (event, data) {
-            data.form.validationEngine();
-        },
-        //Validate form when it is being submitted
-        formSubmitting: function (event, data) {
-            return data.form.validationEngine('validate');
-        },
-        //Dispose validation logic when form is closed
-        formClosed: function (event, data) {
-            data.form.validationEngine('hide');
-            data.form.validationEngine('detach');
-        }
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
     });
 
     versionContainer.jtable({
@@ -200,7 +189,7 @@ $(document).ready(function () {
                 defaultValue: 'Optional'
             },
             betta: {
-                title: 'Is betta version?',
+                title: 'Version type',
                 type: 'checkbox',
                 values: {'false': 'Release version', 'true': 'Betta version'},
                 defaultValue: false
@@ -220,19 +209,9 @@ $(document).ready(function () {
                 inputClass: 'validate[required]'
             }
         },
-        //Initialize validation logic when a form is created
-        formCreated: function (event, data) {
-            data.form.validationEngine();
-        },
-        //Validate form when it is being submitted
-        formSubmitting: function (event, data) {
-            return data.form.validationEngine('validate');
-        },
-        //Dispose validation logic when form is closed
-        formClosed: function (event, data) {
-            data.form.validationEngine('hide');
-            data.form.validationEngine('detach');
-        }
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
     });
 
     logsContainer.jtable({
@@ -278,6 +257,36 @@ $(document).ready(function () {
                 title: 'Access type'
             }
         }
+    });
+
+    usersContainer.jtable({
+        jqueryuiTheme: true,
+        ajaxSettings: {type: 'GET'},
+        title: 'Users',
+        actions: {
+            listAction: '/crud/account/read',
+            // createAction: '/crud/account/create',
+            updateAction: '/crud/account/update',
+            deleteAction: '/crud/account/delete'
+        },
+        fields: {
+            id: {
+                title: '#',
+                key: true
+            },
+            name: {
+                title: 'User Name',
+                inputClass: 'validate[required]'
+            },
+            role: {
+                title: 'Role',
+                options: {'ROLE_ADMIN': 'ROLE_ADMIN', 'ROLE_USER': 'ROLE_USER', 'ROLE_NOTHING': 'ROLE_NOTHING'},
+                inputClass: 'validate[required]'
+            }
+        },
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
     });
 
     for (var i = 0; i < containers.length; i++) {
