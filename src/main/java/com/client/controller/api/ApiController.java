@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +28,9 @@ import java.text.SimpleDateFormat;
 @Controller
 public abstract class ApiController {
 
+    static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     protected final Logger log = LoggerFactory.getLogger(AccessListApiController.class);
-    protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
-    // TODO: do this jmx-able
+    // TODO: create new table with this config
     protected Boolean allowFreeFirstTimeUsage = false;
     protected Integer freeDaysPeriod = 1;
 
@@ -47,6 +45,10 @@ public abstract class ApiController {
 
     @Autowired
     BlackListService blackListService;
+
+    public static DateFormat getDateFormat() {
+        return DATE_FORMAT;
+    }
 
     @ResponseBody
     @RequestMapping(value = "/checkForUpdates", method = RequestMethod.GET)
@@ -100,9 +102,5 @@ public abstract class ApiController {
 
     public void setFreeDaysPeriod(Integer freeDaysPeriod) {
         this.freeDaysPeriod = freeDaysPeriod;
-    }
-
-    public static DateFormat getDateFormat() {
-        return DATE_FORMAT;
     }
 }

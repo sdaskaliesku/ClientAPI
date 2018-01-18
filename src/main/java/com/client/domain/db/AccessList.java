@@ -9,14 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Date;
 
 /**
  * @author sdaskaliesku
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("ALL")
 @Entity
 @Table(name = "AccessList")
 @NamedQueries({
@@ -52,14 +51,10 @@ public class AccessList implements Serializable {
     @Column
     private Boolean clan;
 
-    @Transient
-    private Boolean isClanAccess;
-
     public AccessList() {
         this.fromDate = new Date(new java.util.Date().getTime());
         this.dueDate = this.fromDate;
         this.clan = false;
-        this.isClanAccess = this.clan;
         this.accessType = AccessType.Basic;
         this.comments = "";
     }
@@ -118,13 +113,5 @@ public class AccessList implements Serializable {
 
     public void setClan(Boolean clan) {
         this.clan = clan;
-    }
-
-    public Boolean getClanAccess() {
-        return isClanAccess;
-    }
-
-    public void setClanAccess(Boolean clanAccess) {
-        isClanAccess = clanAccess;
     }
 }

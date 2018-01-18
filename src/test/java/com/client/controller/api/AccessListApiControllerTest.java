@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -73,7 +74,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -118,7 +119,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -141,7 +142,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(lastDate);
         accessList.setClan(true);
         accessList.setName("pn");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
 
         String nickName = "manson";
@@ -171,7 +172,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -214,7 +215,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -237,7 +238,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(true);
         accessList.setName("pn");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
 
         String nickName = "manson";
@@ -265,7 +266,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -288,7 +289,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(true);
         accessList.setName("pn");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
 
         String nickName = "4234";
@@ -317,7 +318,7 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(false);
         accessList.setName("manson");
-        accessList.setClanAccess(false);
+
         allAccessList.add(accessList);
         accessList = new AccessList();
         accessList.setName("1");
@@ -340,7 +341,6 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         accessList.setDueDate(DateUtils.addMonth(2));
         accessList.setClan(true);
         accessList.setName("pn");
-        accessList.setClanAccess(false);
         allAccessList.add(accessList);
 
         String nickName = "4234";

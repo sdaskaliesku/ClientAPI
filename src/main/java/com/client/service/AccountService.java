@@ -28,7 +28,7 @@ public class AccountService extends AbstractService<Account> implements UserDeta
 
     @PostConstruct
     public void initialize() {
-
+        this.repository = accountRepository;
     }
 
     @Override

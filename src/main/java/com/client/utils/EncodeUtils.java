@@ -1,5 +1,6 @@
 package com.client.utils;
 
+import com.client.domain.db.CryptoKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,8 +25,29 @@ public class EncodeUtils {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    private static final String UNICODE_FORMAT = "UTF8";
+    private static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
+    private Cipher cipher;
+    private SecretKey key;
+    private String encryptKey;
 
-    private static final EncodeUtils INSTANCE = new EncodeUtils();
+    public EncodeUtils(CryptoKey cryptoKey) {
+        this(cryptoKey.getCryptoKey());
+    }
+
+    public EncodeUtils(String encryptKey) {
+        try {
+            this.encryptKey = encryptKey;
+            String myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
+            byte[] arrayBytes = encryptKey.getBytes(UNICODE_FORMAT);
+            KeySpec ks = new DESedeKeySpec(arrayBytes);
+            SecretKeyFactory skf = SecretKeyFactory.getInstance(myEncryptionScheme);
+            cipher = Cipher.getInstance(myEncryptionScheme);
+            key = skf.generateSecret(ks);
+        } catch (Exception e) {
+            log.error("Error initializing encode utils", e);
+        }
+    }
 
     private static String objectToString(Object o) {
         try {
@@ -45,53 +67,38 @@ public class EncodeUtils {
         return null;
     }
 
-    private static String action(String input, boolean encrypt) {
+    private static EncodeUtils getNewInstance(String encryptKey) {
+        return new EncodeUtils(encryptKey);
+    }
+
+    private static String action(String encryptKey, String input, boolean encrypt) {
         String encoded = input;
+        EncodeUtils encodeUtils = getNewInstance(encryptKey);
         for (int i = 0; i < 5; i++) {
             if (encrypt) {
-                encoded = INSTANCE.encrypt(encoded);
+                encoded = encodeUtils.encrypt(encoded);
             } else {
-                encoded = INSTANCE.decrypt(encoded);
+                encoded = encodeUtils.decrypt(encoded);
             }
         }
         return encoded;
     }
 
-    public static String encode(Object object) {
+    public String encode(Object object) {
         String value = objectToString(object);
-        return action(value, true);
+        return action(encryptKey, value, true);
     }
 
-    public static <T> T decode(String encoded, Class<T> clazz) {
+    public <T> T decode(String encoded, Class<T> clazz) {
         try {
-            return stringToObject(action(encoded, false), clazz);
+            return stringToObject(action(encryptKey, encoded, false), clazz);
         } catch (Exception e) {
             log.error("Error decoding", e);
         }
         return null;
     }
 
-    private static final String UNICODE_FORMAT = "UTF8";
-    private static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
-    private Cipher cipher;
-    private SecretKey key;
-
-    public EncodeUtils() {
-        try {
-            String myEncryptionKey = "@^-^xn#zXgB42wryP7=kCnrm28GpUT9z$_M*HHX=E?+u-FK4+TfadTgvp-B%wXWT";
-            String myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
-            byte[] arrayBytes = myEncryptionKey.getBytes(UNICODE_FORMAT);
-            KeySpec ks = new DESedeKeySpec(arrayBytes);
-            SecretKeyFactory skf = SecretKeyFactory.getInstance(myEncryptionScheme);
-            cipher = Cipher.getInstance(myEncryptionScheme);
-            key = skf.generateSecret(ks);
-        } catch (Exception e) {
-            log.error("Error initializing encode utils", e);
-        }
-    }
-
-
-    public String encrypt(String unencryptedString) {
+    private String encrypt(String unencryptedString) {
         String encryptedString = null;
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -105,7 +112,7 @@ public class EncodeUtils {
     }
 
 
-    public String decrypt(String encryptedString) {
+    private String decrypt(String encryptedString) {
         String decryptedText = null;
         try {
             cipher.init(Cipher.DECRYPT_MODE, key);

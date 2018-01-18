@@ -51,14 +51,14 @@ public class ClientVersionApiController extends ApiController {
     @Override
     @ResponseBody
     @RequestMapping(value = "/getVersion", method = RequestMethod.GET)
-    public Response getVersion(@RequestParam Double version, @RequestParam Boolean isBetta) {
-        log.info("New getVersion request: {}/{}", version, isBetta);
-        ClientVersion clientVersion = clientVersionService.getClientVersion(version, isBetta);
+    public Response getVersion(@RequestParam Double userVersion, @RequestParam Boolean betta) {
+        log.info("New getVersion request: {}/{}", userVersion, betta);
+        ClientVersion clientVersion = clientVersionService.getClientVersion(userVersion, betta);
         Response response = new Response();
         if (clientVersion != null) {
             response.setRecord(clientVersion);
         } else {
-            response.setMessage("Version: " + version + " with type: " + isBetta + " does not exists. Try again.");
+            response.setMessage("Version: " + userVersion + " with type: " + betta + " does not exists. Try again.");
         }
         return response;
     }

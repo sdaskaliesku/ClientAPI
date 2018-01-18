@@ -10,6 +10,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.sql.Date;
 
 /**
  * @author sdaskaliesku
@@ -66,7 +67,11 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
     @Column
     private String link;
 
+    @Column
+    private Date date;
+
     public ClientVersion() {
+        this.date = new Date(new java.util.Date().getTime());
         this.banned = false;
         this.betta = false;
         this.link = "";
@@ -139,6 +144,14 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override

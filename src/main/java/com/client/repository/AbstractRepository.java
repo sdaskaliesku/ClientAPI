@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class AbstractRepository<T> {
 
     @PersistenceContext
-    protected EntityManager entityManager;
+    EntityManager entityManager;
 
     @Transactional
     public abstract List<T> getAll();
@@ -36,6 +36,8 @@ public abstract class AbstractRepository<T> {
 
     @Transactional
     public void delete(Long id) {
-        delete(entityManager.find((Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), AbstractRepository.class), id));
+        Class<T> tClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), AbstractRepository.class);
+        T t = entityManager.find(tClass, id);
+        delete(t);
     }
 }

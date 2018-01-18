@@ -9,8 +9,9 @@ $(document).ready(function () {
     var versionContainer = $('#versionContainer');
     var logsContainer = $('#logsContainer');
     var usersContainer = $('#usersContainer');
+    var cryptoKeyContainer = $('#cryptoKeyContainer');
 
-    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer, usersContainer];
+    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer, usersContainer, cryptoKeyContainer];
 
     //Initialize validation logic when a form is created
     function formCreated(event, data) {
@@ -182,6 +183,11 @@ $(document).ready(function () {
                 title: 'Version',
                 inputClass: 'validate[required]'
             },
+            date: {
+                title: 'Date',
+                inputClass: 'validate[required]',
+                type: 'date'
+            },
             updatePolicy: {
                 title: 'UpdatePolicy',
                 options: {'Required': 'Required', 'Optional': 'Optional'},
@@ -281,6 +287,36 @@ $(document).ready(function () {
             role: {
                 title: 'Role',
                 options: {'ROLE_ADMIN': 'ROLE_ADMIN', 'ROLE_USER': 'ROLE_USER', 'ROLE_NOTHING': 'ROLE_NOTHING'},
+                inputClass: 'validate[required]'
+            }
+        },
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
+    });
+
+    cryptoKeyContainer.jtable({
+        jqueryuiTheme: true,
+        ajaxSettings: {type: 'GET'},
+        title: 'CryptoKey',
+        actions: {
+            listAction: '/crud/cryptoKey/read',
+            createAction: '/crud/cryptoKey/create',
+            updateAction: '/crud/cryptoKey/update',
+            deleteAction: '/crud/cryptoKey/delete'
+        },
+        fields: {
+            id: {
+                title: '#',
+                key: true
+            },
+            date: {
+                title: 'Date',
+                type: 'date',
+                inputClass: 'validate[required]'
+            },
+            cryptoKey: {
+                title: 'Key',
                 inputClass: 'validate[required]'
             }
         },

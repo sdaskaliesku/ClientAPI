@@ -5,15 +5,17 @@ import com.client.domain.db.AccessList;
 import com.client.domain.db.ActivateRequest;
 import com.client.domain.db.ClientVersion;
 import com.client.domain.enums.AccessType;
+import com.client.domain.enums.UpdatePolicy;
 import com.client.domain.enums.VersionCheckResult;
 import com.client.domain.responses.ActivateResponse;
 import com.client.domain.responses.Response;
+import com.client.service.CryptoKeyService;
 import com.client.utils.DateUtils;
 import com.client.utils.EncodeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +34,18 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/api/access")
 public class AccessListApiController extends ApiController {
+
+    @Autowired
+    private CryptoKeyService cryptoKeyService;
+
+    private static String getIpAddress(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (StringUtils.isEmpty(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
+    }
+
     @Override
     public Response checkForUpdates(@Valid @ModelAttribute UpdateRequest updateRequest) throws Exception {
         throw new NotSupportedException();
@@ -76,8 +90,27 @@ public class AccessListApiController extends ApiController {
     @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
-        ActivateRequest activateRequest = EncodeUtils.decode(httpServletRequest.getParameter("request"), ActivateRequest.class);
-        return EncodeUtils.encode(activate(activateRequest, httpServletRequest));
+        EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
+        ActivateRequest activateRequest = encodeUtils.decode(httpServletRequest.getParameter("request"), ActivateRequest.class);
+        return encodeUtils.encode(activate(activateRequest, httpServletRequest));
+    }
+
+    public static VersionCheckResult fromUpdatePolicy(ClientVersion lastVersion, double currentVersion, boolean isBeta) {
+        if (lastVersion.getVersion() > currentVersion) {
+            if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
+                return VersionCheckResult.Required;
+            }
+            return VersionCheckResult.Optional;
+        }
+        if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
+            return VersionCheckResult.Required;
+        } else if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Optional)) {
+            return VersionCheckResult.Optional;
+        }
+        if (isBeta) {
+            return VersionCheckResult.UpToDateBeta;
+        }
+        return VersionCheckResult.UpToDate;
     }
 
     @Override
@@ -97,6 +130,8 @@ public class AccessListApiController extends ApiController {
             boolean isUserInBlackList = blackListService.isUserInBlackList(activateRequest.getNickName());
             if (isClanInBlackList || isUserInBlackList) {
                 // access denied
+                response.setNickname(activateRequest.getNickName());
+                response.setClanName(activateRequest.getClanName());
                 response.setAccessType(AccessType.Denied);
                 if (isClanInBlackList) {
                     response.setMessage("Clan is banned!");
@@ -109,6 +144,7 @@ public class AccessListApiController extends ApiController {
                     .isVersionBanned(activateRequest.getClientVersion(), activateRequest.getBetta());
             ClientVersion clientVersion = clientVersionService.getLastVersion(activateRequest.getBetta());
             if (Objects.nonNull(clientVersion)) {
+                response.setVersionCheckResult(fromUpdatePolicy(clientVersion, activateRequest.getClientVersion(), activateRequest.getBetta()));
                 response.setUrlForUpdate(clientVersion.getLink());
                 response.setReleaseNotes(clientVersion.getReleaseNotes());
                 if (isVersionBanned) {
@@ -139,7 +175,6 @@ public class AccessListApiController extends ApiController {
                 if (allowFreeFirstTimeUsage) {
                     AccessList newAccess = new AccessList();
                     newAccess.setAccessType(AccessType.Basic);
-                    newAccess.setClanAccess(false);
                     newAccess.setClan(false);
                     newAccess.setName(activateRequest.getNickName());
                     newAccess.setDueDate(DateUtils.addDay(freeDaysPeriod));
@@ -157,13 +192,5 @@ public class AccessListApiController extends ApiController {
             log.error("Error activating", e);
         }
         return response;
-    }
-
-    private static String getIpAddress(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-        if (StringUtils.isEmpty(ipAddress)) {
-            ipAddress = request.getRemoteAddr();
-        }
-        return ipAddress;
     }
 }

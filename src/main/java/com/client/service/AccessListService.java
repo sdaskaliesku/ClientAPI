@@ -35,17 +35,6 @@ public class AccessListService extends AbstractService<AccessList> {
         }
         result.setAccessType(getBestAccessType(list));
         result.setDueDate(getLastDate(list));
-        result.setClanAccess(false);
-        for (AccessList accessList : list) {
-            if (accessList.getClan()) {
-                if (accessList.getAccessType().equals(result.getAccessType())) {
-                    if (accessList.getDueDate().equals(result.getDueDate())) {
-                        result.setClanAccess(true);
-                        break;
-                    }
-                }
-            }
-        }
         return result;
     }
 

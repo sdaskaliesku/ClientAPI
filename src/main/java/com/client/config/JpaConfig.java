@@ -25,7 +25,7 @@ import java.util.Properties;
 public class JpaConfig implements TransactionManagementConfigurer {
 
     private static final DBConfig OPEN_SHIFT_CONFIG = new DBConfig("com.mysql.jdbc.Driver", "org.hibernate.dialect.MySQL5InnoDBDialect", "userNQX", "ctsRX0Ao52bS6yiv", "jdbc:mysql://mysql:3306/sampledb?useUnicode=true&characterEncoding=utf8");
-    private static final DBConfig LOCAL_CONFIG = new DBConfig("com.mysql.jdbc.Driver", "org.hibernate.dialect.MySQL5InnoDBDialect", "root", "", "jdbc:mysql://localhost/neolands?useUnicode=true&characterEncoding=utf8");
+    private static final DBConfig LOCAL_CONFIG = new DBConfig("com.mysql.jdbc.Driver", "org.hibernate.dialect.MySQL5InnoDBDialect", "root", "", "jdbc:mysql://localhost/sampledb?useUnicode=true&characterEncoding=utf8");
     private static final DBConfig HEROKU_CONFIG = DBConfig.getHerokuConfig();
 
     @Value("${hibernate.hbm2ddl.auto}")
@@ -34,11 +34,13 @@ public class JpaConfig implements TransactionManagementConfigurer {
     private String showSql;
     @Value("${hibernate.format_sql}")
     private String formatSql;
-    @Value("${dataSource.isProd}")
-    private boolean isProd;
+
+    private static boolean isLocal() {
+        return Boolean.valueOf(System.getProperty("neo.isLocal"));
+    }
 
     private DBConfig getDBConfig() {
-        if (isProd) {
+        if (!isLocal()) {
             if (DBConfig.isHeroku() && Objects.nonNull(HEROKU_CONFIG)) {
                 return HEROKU_CONFIG;
             }
