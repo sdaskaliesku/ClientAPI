@@ -24,8 +24,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -111,12 +114,22 @@ public class AccessListApiController extends ApiController {
         }
     }
 
+    private static String getDefaultCharSet() {
+        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream());
+        String enc = writer.getEncoding();
+        return enc;
+    }
+
     @Override
     @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
         String inputString = httpServletRequest.getParameter("request");
+        System.out.println("Default Charset=" + Charset.defaultCharset());
+        System.out.println("file.encoding=" + System.getProperty("file.encoding"));
+        System.out.println("Default Charset in Use=" + getDefaultCharSet());
+
         ActivateRequest activateRequest = encodeUtils.decode(inputString, ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
     }
