@@ -46,6 +46,24 @@ public class AccessListApiController extends ApiController {
         return ipAddress;
     }
 
+    public static VersionCheckResult fromUpdatePolicy(ClientVersion lastVersion, double currentVersion, boolean isBeta) {
+        if (lastVersion.getVersion() > currentVersion) {
+            if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
+                return VersionCheckResult.Required;
+            }
+            return VersionCheckResult.Optional;
+        }
+        if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
+            return VersionCheckResult.Required;
+        } else if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Optional)) {
+            return VersionCheckResult.Optional;
+        }
+        if (isBeta) {
+            return VersionCheckResult.UpToDateBeta;
+        }
+        return VersionCheckResult.UpToDate;
+    }
+
     @Override
     public Response checkForUpdates(@Valid @ModelAttribute UpdateRequest updateRequest) throws Exception {
         throw new NotSupportedException();
@@ -87,30 +105,12 @@ public class AccessListApiController extends ApiController {
     }
 
     @Override
-    @RequestMapping(value = "/activate", method = RequestMethod.POST)
+    @RequestMapping(value = "/activate", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
         ActivateRequest activateRequest = encodeUtils.decode(httpServletRequest.getParameter("request"), ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
-    }
-
-    public static VersionCheckResult fromUpdatePolicy(ClientVersion lastVersion, double currentVersion, boolean isBeta) {
-        if (lastVersion.getVersion() > currentVersion) {
-            if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
-                return VersionCheckResult.Required;
-            }
-            return VersionCheckResult.Optional;
-        }
-        if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
-            return VersionCheckResult.Required;
-        } else if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Optional)) {
-            return VersionCheckResult.Optional;
-        }
-        if (isBeta) {
-            return VersionCheckResult.UpToDateBeta;
-        }
-        return VersionCheckResult.UpToDate;
     }
 
     @Override
