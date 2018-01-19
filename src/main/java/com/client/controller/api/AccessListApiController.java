@@ -107,7 +107,7 @@ public class AccessListApiController extends ApiController {
     }
 
     @Override
-    @RequestMapping(value = "/activate", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8", consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
