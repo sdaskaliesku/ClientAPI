@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,7 +112,13 @@ public class AccessListApiController extends ApiController {
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
         String inputString = httpServletRequest.getParameter("request");
-        ActivateRequest activateRequest = encodeUtils.decode(inputString, ActivateRequest.class);
+        String decodedInputString;
+        try {
+            decodedInputString = URLDecoder.decode(inputString, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            decodedInputString = inputString;
+        }
+        ActivateRequest activateRequest = encodeUtils.decode(decodedInputString, ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
     }
 
