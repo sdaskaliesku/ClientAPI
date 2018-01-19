@@ -81,6 +81,8 @@ public class EncodeUtils {
                 encoded = encodeUtils.decrypt(encoded);
             }
         }
+        System.out.println("Input string: " + input);
+        System.out.println("Decoded string: " + encoded);
         return encoded;
     }
 

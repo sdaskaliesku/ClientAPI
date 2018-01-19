@@ -109,7 +109,8 @@ public class AccessListApiController extends ApiController {
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
-        ActivateRequest activateRequest = encodeUtils.decode(httpServletRequest.getParameter("request"), ActivateRequest.class);
+        String inputString = httpServletRequest.getParameter("request");
+        ActivateRequest activateRequest = encodeUtils.decode(inputString, ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
     }
 
