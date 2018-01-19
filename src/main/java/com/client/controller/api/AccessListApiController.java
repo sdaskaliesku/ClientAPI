@@ -114,22 +114,13 @@ public class AccessListApiController extends ApiController {
         }
     }
 
-    private static String getDefaultCharSet() {
-        OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream());
-        String enc = writer.getEncoding();
-        return enc;
-    }
-
     @Override
     @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
         String inputString = httpServletRequest.getParameter("request");
-        System.out.println("Default Charset=" + Charset.defaultCharset());
-        System.out.println("file.encoding=" + System.getProperty("file.encoding"));
-        System.out.println("Default Charset in Use=" + getDefaultCharSet());
-
+        System.setProperty("file.encoding", "UTF-8");
         ActivateRequest activateRequest = encodeUtils.decode(inputString, ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
     }
