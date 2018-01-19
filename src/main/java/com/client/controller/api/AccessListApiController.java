@@ -87,6 +87,9 @@ public class AccessListApiController extends ApiController {
     }
 
     private Optional<ActivateRequest> findActivateRequest(ActivateRequest activateRequest) {
+        if (Objects.isNull(activateRequest)) {
+            return Optional.empty();
+        }
         List<ActivateRequest> activateRequests = activateRequestService.read();
         for (ActivateRequest request : activateRequests) {
             if (request.getNickName().equalsIgnoreCase(activateRequest.getNickName())) {
@@ -102,7 +105,9 @@ public class AccessListApiController extends ApiController {
         if (opt.isPresent()) {
             activateRequestService.update(opt.get());
         } else {
-            activateRequestService.create(activateRequest);
+            if (Objects.nonNull(activateRequest)) {
+                activateRequestService.create(activateRequest);
+            }
         }
     }
 
@@ -112,13 +117,7 @@ public class AccessListApiController extends ApiController {
     public String activate(HttpServletRequest httpServletRequest) {
         EncodeUtils encodeUtils = new EncodeUtils(cryptoKeyService.getCryptoKey());
         String inputString = httpServletRequest.getParameter("request");
-        String decodedInputString;
-        try {
-            decodedInputString = URLDecoder.decode(inputString, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            decodedInputString = inputString;
-        }
-        ActivateRequest activateRequest = encodeUtils.decode(decodedInputString, ActivateRequest.class);
+        ActivateRequest activateRequest = encodeUtils.decode(inputString, ActivateRequest.class);
         return encodeUtils.encode(activate(activateRequest, httpServletRequest));
     }
 

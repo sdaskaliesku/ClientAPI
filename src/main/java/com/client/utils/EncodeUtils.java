@@ -4,6 +4,7 @@ import com.client.domain.db.CryptoKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,9 @@ public class EncodeUtils {
     }
 
     private static String action(String encryptKey, String input, boolean encrypt) {
+        if (StringUtils.isEmpty(input)) {
+            return null;
+        }
         String encoded = input;
         EncodeUtils encodeUtils = getNewInstance(encryptKey);
         for (int i = 0; i < 5; i++) {
@@ -92,8 +96,12 @@ public class EncodeUtils {
     }
 
     public <T> T decode(String encoded, Class<T> clazz) {
+        if (StringUtils.isEmpty(encoded)) {
+            return null;
+        }
         try {
-            return stringToObject(action(encryptKey, encoded, false), clazz);
+            String decodedString = action(encryptKey, encoded, false);
+            return stringToObject(decodedString, clazz);
         } catch (Exception e) {
             log.error("Error decoding", e);
         }
