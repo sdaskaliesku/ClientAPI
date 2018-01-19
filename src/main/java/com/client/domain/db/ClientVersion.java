@@ -22,15 +22,10 @@ import java.sql.Date;
         @NamedQuery(name = ClientVersion.GET_ALL_VERSIONS, query = "select v from ClientVersion v"),
         @NamedQuery(name = ClientVersion.GET_ALL_ALLOWED_VERSIONS, query = "select v from ClientVersion v where v.banned = :isBanned"),
         @NamedQuery(name = ClientVersion.GET_ALL_VERSIONS_DESC, query = "select v from ClientVersion v " +
-                "where v.betta = :isBetta and v.banned = :isBanned ORDER BY v.version DESC"),
-        @NamedQuery(name = ClientVersion.GET_VERSION_BY_VERSION_AND_BETTA, query = "select v from ClientVersion v " +
-                "where v.version = :version and v.betta = :isBetta and v.banned = :isBanned"),
+                "where v.banned = :isBanned ORDER BY v.version DESC"),
         @NamedQuery(name = ClientVersion.GET_CURRENT_VERSION, query = "select v from ClientVersion v " +
                 "where v.version = :version and v.banned = :isBanned")
 })
-/*
-  Client version cannot be both Required for update and betta. Only stable versions are allowed.
- */
 public class ClientVersion implements Serializable, Comparable<ClientVersion> {
 
     public static final String GET_ALL_VERSIONS = "UpdateRequest.getAllVersions";
@@ -38,8 +33,6 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
     public static final String GET_ALL_ALLOWED_VERSIONS = "UpdateRequest.getAllAllowedVersions";
 
     public static final String GET_ALL_VERSIONS_DESC = "UpdateRequest.getAllVersionsDesc";
-
-    public static final String GET_VERSION_BY_VERSION_AND_BETTA = "UpdateRequest.getVersionByVersionAndBetta";
 
     public static final String GET_CURRENT_VERSION = "UpdateRequest.getCurrentVersion";
 
@@ -56,9 +49,6 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
     private UpdatePolicy updatePolicy;
 
     @Column
-    private Boolean betta;
-
-    @Column
     private Boolean banned;
 
     @Column
@@ -73,18 +63,16 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
     public ClientVersion() {
         this.date = new Date(new java.util.Date().getTime());
         this.banned = false;
-        this.betta = false;
         this.link = "";
         this.releaseNotes = "";
         this.version = 0.0;
         this.updatePolicy = UpdatePolicy.Optional;
     }
 
-    public ClientVersion(Double version, UpdatePolicy updatePolicy, Boolean betta, Boolean banned, String releaseNotes, String link) {
+    public ClientVersion(Double version, UpdatePolicy updatePolicy, Boolean banned, String releaseNotes, String link) {
         this();
         this.version = version;
         this.updatePolicy = updatePolicy;
-        this.betta = betta;
         this.banned = banned;
         this.releaseNotes = releaseNotes;
         this.link = link;
@@ -112,14 +100,6 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
 
     public void setUpdatePolicy(UpdatePolicy updatePolicy) {
         this.updatePolicy = updatePolicy;
-    }
-
-    public Boolean getBetta() {
-        return betta;
-    }
-
-    public void setBetta(Boolean betta) {
-        this.betta = betta;
     }
 
     public Boolean getBanned() {
@@ -176,7 +156,6 @@ public class ClientVersion implements Serializable, Comparable<ClientVersion> {
                 "id=" + id +
                 ", version=" + version +
                 ", updatePolicy=" + updatePolicy +
-                ", betta=" + betta +
                 ", banned=" + banned +
                 ", releaseNotes='" + releaseNotes + '\'' +
                 ", link='" + link + '\'' +

@@ -56,11 +56,11 @@ public abstract class ApiController {
 
     @ResponseBody
     @RequestMapping(value = "/getLastVersion", method = RequestMethod.GET)
-    public abstract Response getLastVersion(@RequestParam Boolean allowBetta) throws Exception;
+    public abstract Response getLastVersion() throws Exception;
 
     @ResponseBody
     @RequestMapping(value = "/getVersion", method = RequestMethod.GET)
-    public abstract Response getVersion(@RequestParam Double version, @RequestParam Boolean isBetta) throws Exception;
+    public abstract Response getVersion(@RequestParam Double version) throws Exception;
 
     @ResponseBody
     @RequestMapping(value = "/getAllVersions", method = RequestMethod.GET)

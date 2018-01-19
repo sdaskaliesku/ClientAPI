@@ -24,11 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,7 +46,7 @@ public class AccessListApiController extends ApiController {
         return ipAddress;
     }
 
-    public static VersionCheckResult fromUpdatePolicy(ClientVersion lastVersion, double currentVersion, boolean isBeta) {
+    public static VersionCheckResult fromUpdatePolicy(ClientVersion lastVersion, double currentVersion) {
         if (lastVersion.getVersion() > currentVersion) {
             if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
                 return VersionCheckResult.Required;
@@ -63,9 +58,6 @@ public class AccessListApiController extends ApiController {
         } else if (lastVersion.getUpdatePolicy().equals(UpdatePolicy.Optional)) {
             return VersionCheckResult.Optional;
         }
-        if (isBeta) {
-            return VersionCheckResult.UpToDateBeta;
-        }
         return VersionCheckResult.UpToDate;
     }
 
@@ -75,12 +67,12 @@ public class AccessListApiController extends ApiController {
     }
 
     @Override
-    public Response getLastVersion(@RequestParam Boolean allowBetta) throws Exception {
+    public Response getLastVersion() throws Exception {
         throw new NotSupportedException();
     }
 
     @Override
-    public Response getVersion(@RequestParam Double version, @RequestParam Boolean isBetta) throws Exception {
+    public Response getVersion(@RequestParam Double version) throws Exception {
         throw new NotSupportedException();
     }
 
@@ -153,10 +145,10 @@ public class AccessListApiController extends ApiController {
                 return response;
             }
             boolean isVersionBanned = clientVersionService
-                    .isVersionBanned(activateRequest.getClientVersion(), activateRequest.getBetta());
-            ClientVersion clientVersion = clientVersionService.getLastVersion(activateRequest.getBetta());
+                    .isVersionBanned(activateRequest.getClientVersion());
+            ClientVersion clientVersion = clientVersionService.getLastVersion();
             if (Objects.nonNull(clientVersion)) {
-                response.setVersionCheckResult(fromUpdatePolicy(clientVersion, activateRequest.getClientVersion(), activateRequest.getBetta()));
+                response.setVersionCheckResult(fromUpdatePolicy(clientVersion, activateRequest.getClientVersion()));
                 response.setUrlForUpdate(clientVersion.getLink());
                 response.setReleaseNotes(clientVersion.getReleaseNotes());
                 if (isVersionBanned) {

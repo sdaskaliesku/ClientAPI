@@ -9,17 +9,11 @@ public class UpdateRequest implements Serializable {
 
     private Double userVersion;
 
-    private Boolean isBetta;
-
-    private Boolean updateToBeta;
-
     public UpdateRequest() {
     }
 
-    public UpdateRequest(Double userVersion, Boolean isBetta, Boolean updateToBeta) {
+    public UpdateRequest(Double userVersion) {
         this.userVersion = userVersion;
-        this.isBetta = isBetta;
-        this.updateToBeta = updateToBeta;
     }
 
     public Double getUserVersion() {
@@ -30,28 +24,9 @@ public class UpdateRequest implements Serializable {
         this.userVersion = userVersion;
     }
 
-    public Boolean getUpdateToBeta() {
-        return updateToBeta;
-    }
-
-    public Boolean getBetta() {
-        return isBetta;
-    }
-
-    public void setBetta(Boolean betta) {
-        isBetta = betta;
-    }
-
-    public void setUpdateToBeta(Boolean updateToBeta) {
-        this.updateToBeta = updateToBeta;
-    }
-
     @Override
     public String toString() {
         return "UpdateRequest{" +
-                "userVersion=" + userVersion +
-                ", isBetta=" + isBetta +
-                ", updateToBeta=" + updateToBeta +
-                '}';
+                "userVersion=" + userVersion + '}';
     }
 }

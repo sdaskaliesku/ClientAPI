@@ -6,6 +6,5 @@ package com.client.domain.enums;
 public enum VersionCheckResult {
     Required, // everyone MUST update 0
     Optional, // there is new version, but it's optional update 1
-    UpToDate, // user has the last version 2
-    UpToDateBeta // the newest beta version 3
+    UpToDate // user has the last version 2
 }

@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * @author sdaskaliesku
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("all")
 @Entity
 @Table(name = "BlackList")
 @NamedQueries({

@@ -20,18 +20,14 @@ public class UpdateResponse extends Response {
     private String comments;
 
     @JsonProperty
-    private Boolean isBetta;
-
-    @JsonProperty
     private Double version;
 
     public UpdateResponse() {
     }
 
-    public UpdateResponse(VersionCheckResult versionCheckResult, String url, Boolean isBetta, Double version) {
+    public UpdateResponse(VersionCheckResult versionCheckResult, String url, Double version) {
         this.versionCheckResult = versionCheckResult;
         this.url = url;
-        this.isBetta = isBetta;
         this.version = version;
     }
 
@@ -57,14 +53,6 @@ public class UpdateResponse extends Response {
 
     public void setComments(String comments) {
         this.comments = comments;
-    }
-
-    public Boolean getBetta() {
-        return isBetta;
-    }
-
-    public void setBetta(Boolean betta) {
-        isBetta = betta;
     }
 
     public Double getVersion() {

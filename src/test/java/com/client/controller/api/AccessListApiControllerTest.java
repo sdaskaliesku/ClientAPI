@@ -50,8 +50,8 @@ public class AccessListApiControllerTest extends ApiControllerTest {
         apiController.setBlackListService(blackListService);
     }
 
-    private void mockIsClientVersionBanned(double version, boolean updateToBetta, boolean result) {
-        when(clientVersionService.isVersionBanned(version, updateToBetta)).thenReturn(result);
+    private void mockIsClientVersionBanned(double version, boolean result) {
+        when(clientVersionService.isVersionBanned(version)).thenReturn(result);
     }
 
     private void mockIsUserInBlackList(String nickname, boolean result) {
@@ -365,13 +365,11 @@ public class AccessListApiControllerTest extends ApiControllerTest {
 
     private ActivateRequest getTestActivateRequest(String clanName, String nickName) {
         double version = 1.0;
-        boolean betta = false;
         ActivateRequest activateRequest = new ActivateRequest();
-        activateRequest.setBetta(betta);
         activateRequest.setClanName(clanName);
         activateRequest.setNickName(nickName);
         activateRequest.setClientVersion(version);
-        mockIsClientVersionBanned(version, betta, false);
+        mockIsClientVersionBanned(version, false);
         return activateRequest;
     }
 

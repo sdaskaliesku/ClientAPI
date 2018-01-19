@@ -194,12 +194,6 @@ $(document).ready(function () {
                 inputClass: 'validate[required]',
                 defaultValue: 'Optional'
             },
-            betta: {
-                title: 'Version type',
-                type: 'checkbox',
-                values: {'false': 'Release version', 'true': 'Betta version'},
-                defaultValue: false
-            },
             banned: {
                 title: 'Is banned?',
                 type: 'checkbox',
@@ -255,9 +249,6 @@ $(document).ready(function () {
             },
             activated: {
                 title: 'Is activated?'
-            },
-            isBetta: {
-                title: 'Is Betta?'
             },
             accessType: {
                 title: 'Access type'

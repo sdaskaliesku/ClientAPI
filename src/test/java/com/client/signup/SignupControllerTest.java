@@ -1,5 +1,6 @@
 package com.client.signup;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.allOf;
@@ -8,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.client.config.WebAppConfigurationAware;
-
+@Ignore
 public class SignupControllerTest extends WebAppConfigurationAware {
     @Test
     public void displaysSignupForm() throws Exception {

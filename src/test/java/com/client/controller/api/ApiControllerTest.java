@@ -93,13 +93,11 @@ public abstract class ApiControllerTest {
         return result;
     }
 
-    protected ClientVersion getLastVersion(boolean isBetta) {
+    protected ClientVersion getLastVersion() {
         List<ClientVersion> list = new ArrayList<>(allClientVersionList);
         Collections.sort(list);
         for (ClientVersion clientVersion : list) {
-            if (clientVersion.getBetta() == isBetta) {
-                return clientVersion;
-            }
+            return clientVersion;
         }
         return null;
     }
@@ -134,15 +132,15 @@ public abstract class ApiControllerTest {
 //        when(blackListRepository.isUserOrClanInBlackList(userOrClan)).thenReturn(isUserOrClanInBlackList(userOrClan));
 //    }
 
-    protected void mockGetClientVersion(double version, boolean updateToBetta) {
+    protected void mockGetClientVersion(double version) {
         ClientVersion result = null;
         for (ClientVersion clientVersion : allClientVersionList) {
-            if (clientVersion.getVersion().equals(version) && clientVersion.getBetta().equals(updateToBetta)) {
+            if (clientVersion.getVersion().equals(version)) {
                 result = clientVersion;
                 break;
             }
         }
-        when(clientVersionRepository.getClientVersion(version, updateToBetta)).thenReturn(result);
+        when(clientVersionRepository.getClientVersion(version)).thenReturn(result);
     }
 
     protected void mockGetCurrentVersion(double version) {
@@ -179,10 +177,8 @@ public abstract class ApiControllerTest {
     protected void setUpClientVersionRepository() {
         reset(clientVersionRepository);
         when(clientVersionRepository.getAll()).thenReturn(getAllClientVersionList());
-        boolean isBetta = true;
-        when(clientVersionRepository.getLastVersion(isBetta)).thenReturn(getLastVersion(isBetta));
-        isBetta = false;
-        when(clientVersionRepository.getLastVersion(isBetta)).thenReturn(getLastVersion(isBetta));
+        when(clientVersionRepository.getLastVersion()).thenReturn(getLastVersion());
+        when(clientVersionRepository.getLastVersion()).thenReturn(getLastVersion());
         when(clientVersionRepository.getAllAllowedVersions()).thenReturn(getAllClientVersionList());
 
         ClientVersionService clientVersionService = new ClientVersionService();

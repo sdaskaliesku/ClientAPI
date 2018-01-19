@@ -2,16 +2,15 @@ package com.client.service;
 
 import com.client.domain.UpdateRequest;
 import com.client.domain.db.ClientVersion;
-import com.client.domain.enums.VersionCheckResult;
 import com.client.domain.enums.UpdatePolicy;
+import com.client.domain.enums.VersionCheckResult;
 import com.client.repository.ClientVersionRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author sdaskaliesku
@@ -19,20 +18,10 @@ import java.util.Objects;
 @Service
 public class ClientVersionService extends AbstractService<ClientVersion> {
 
-    private List<ClientVersion> getClientVersionsByType(boolean allowBetta) {
+    private List<ClientVersion> getAllClientVersions() {
         List<ClientVersion> list = read();
         Collections.sort(list);
-        List<ClientVersion> result = new ArrayList<>();
-        for (ClientVersion version : list) {
-            if (!version.getBanned()) {
-                if (allowBetta) {
-                    result.add(version);
-                } else if (!version.getBetta()) {
-                    result.add(version);
-                }
-            }
-        }
-        return result;
+        return list.stream().filter(version -> !version.getBanned()).collect(Collectors.toList());
     }
 
     @Override
@@ -48,24 +37,8 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
         return clientVersions;
     }
 
-    public List<ClientVersion> getStableVersions() {
-        return getClientVersionsByType(false);
-    }
-
-    public List<ClientVersion> getBettaVersions() {
-        return getClientVersionsByType(true);
-    }
-
-    public ClientVersion getLastStableVersion() {
-        return getStableVersions().get(0);
-    }
-
-    public ClientVersion getLastBettaVersion() {
-        return getBettaVersions().get(0);
-    }
-
-    public ClientVersion getLastVersion(boolean allowBetta) {
-        List<ClientVersion> versions = getClientVersionsByType(allowBetta);
+    public ClientVersion getLastVersion() {
+        List<ClientVersion> versions = getAllClientVersions();
         if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(versions)) {
             return versions.get(0);
         }
@@ -74,15 +47,13 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
 
     public VersionCheckResult getUpdateCheckResult(UpdateRequest request, ClientVersion lastVersion) {
         Double version = request.getUserVersion();
-        Boolean isBetta = request.getBetta();
-        Boolean allowBetta = request.getUpdateToBeta();
         VersionCheckResult result = VersionCheckResult.Optional;
-        ClientVersion current = getClientVersion(version, isBetta);
+        ClientVersion current = getClientVersion(version);
         if (Objects.nonNull(current) && current.getBanned()) {
             result = VersionCheckResult.Required;
             return result;
         }
-        List<ClientVersion> list = getClientVersionsByType(allowBetta);
+        List<ClientVersion> list = getAllClientVersions();
         for (ClientVersion clientVersion : list) {
             if (clientVersion.getVersion() > version) {
                 if (clientVersion.getUpdatePolicy().equals(UpdatePolicy.Required)) {
@@ -92,19 +63,15 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
             }
         }
         if (!result.equals(VersionCheckResult.Required) && version >= lastVersion.getVersion()) {
-            if (isBetta) {
-                result = VersionCheckResult.UpToDateBeta;
-            } else {
-                result = VersionCheckResult.UpToDate;
-            }
+            result = VersionCheckResult.UpToDate;
         }
         return result;
     }
 
-    public boolean isVersionBanned(double version, boolean isBetta) {
+    public boolean isVersionBanned(double version) {
         List<ClientVersion> versions = read();
         for (ClientVersion clientVersion : versions) {
-            if (clientVersion.getVersion().equals(version) && clientVersion.getBetta().equals(isBetta)) {
+            if (clientVersion.getVersion().equals(version)) {
                 return clientVersion.getBanned();
             }
         }
@@ -115,8 +82,8 @@ public class ClientVersionService extends AbstractService<ClientVersion> {
         getRepository().setAllVersionsBanned(lastWorkingVersion);
     }
 
-    public ClientVersion getClientVersion(double version, boolean isBetta) {
-        return getRepository().getClientVersion(version, isBetta);
+    public ClientVersion getClientVersion(double version) {
+        return getRepository().getClientVersion(version);
     }
 
     public List<ClientVersion> getCurrentVersion(double version) {

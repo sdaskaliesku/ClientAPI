@@ -54,9 +54,6 @@ public class ActivateRequest implements Serializable {
     private Boolean activated;
 
     @Column
-    private Boolean isBetta;
-
-    @Column
     private AccessType accessType;
 
     @Transient
@@ -131,14 +128,6 @@ public class ActivateRequest implements Serializable {
         this.activated = activated;
     }
 
-    public Boolean getBetta() {
-        return isBetta;
-    }
-
-    public void setBetta(Boolean betta) {
-        isBetta = betta;
-    }
-
     public AccessType getAccessType() {
         return accessType;
     }
@@ -166,7 +155,6 @@ public class ActivateRequest implements Serializable {
                 .append("macAddress", macAddress)
                 .append("clientVersion", clientVersion)
                 .append("activated", activated)
-                .append("isBetta", isBetta)
                 .append("accessType", accessType)
                 .append("millis", millis)
                 .toString();
