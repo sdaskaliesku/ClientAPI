@@ -4,12 +4,14 @@ import com.client.domain.UpdateRequest;
 import com.client.domain.db.AccessList;
 import com.client.domain.db.ActivateRequest;
 import com.client.domain.db.ClientVersion;
+import com.client.domain.db.FreeFunctions;
 import com.client.domain.enums.AccessType;
 import com.client.domain.enums.UpdatePolicy;
 import com.client.domain.enums.VersionCheckResult;
 import com.client.domain.responses.ActivateResponse;
 import com.client.domain.responses.Response;
 import com.client.service.CryptoKeyService;
+import com.client.service.FreeFunctionsService;
 import com.client.utils.DateUtils;
 import com.client.utils.EncodeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author sdaskaliesku
@@ -37,6 +40,9 @@ public class AccessListApiController extends ApiController {
 
     @Autowired
     private CryptoKeyService cryptoKeyService;
+
+    @Autowired
+    private FreeFunctionsService freeFunctionsService;
 
     private static String getIpAddress(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
@@ -162,6 +168,8 @@ public class AccessListApiController extends ApiController {
 
             AccessList accessList = accessListService.getAccessByClanOrUserName(activateRequest.getNickName(),
                     activateRequest.getClanName());
+            response.setNickname(activateRequest.getNickName());
+            response.setClanName(activateRequest.getClanName());
             if (Objects.nonNull(accessList)) {
                 if (response.getAccessType() != AccessType.Denied) {
                     if (DateUtils.isDateEqualOrBeforeToday(accessList.getDueDate())) {
@@ -170,8 +178,6 @@ public class AccessListApiController extends ApiController {
                         response.setAccessType(AccessType.NoAccess);
                         response.setMessage("Timed out!");
                     }
-                    response.setNickname(activateRequest.getNickName());
-                    response.setClanName(activateRequest.getClanName());
                     response.setAccessEndDate(accessList.getDueDate());
                     response.setClanAccess(accessList.getClan());
                 }
@@ -190,6 +196,7 @@ public class AccessListApiController extends ApiController {
                     response.setAccessEndDate(newAccess.getDueDate());
                 }
             }
+            response.setFreeFunctions(freeFunctionsService.read().stream().map(FreeFunctions::getName).collect(Collectors.toList()));
             log.info("Activate response: {}", response);
         } catch (Exception e) {
             response.setRecord(e);

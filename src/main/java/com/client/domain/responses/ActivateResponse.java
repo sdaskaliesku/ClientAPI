@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * @author sdaskaliesku
@@ -23,6 +24,7 @@ public class ActivateResponse extends Response {
     private String urlForUpdate;
     private String releaseNotes;
     private String millis;
+    private List<String> freeFunctions;
 
     public ActivateResponse() {
         accessType = AccessType.NoAccess;
@@ -104,5 +106,13 @@ public class ActivateResponse extends Response {
 
     public void setMillis(String millis) {
         this.millis = millis;
+    }
+
+    public List<String> getFreeFunctions() {
+        return freeFunctions;
+    }
+
+    public void setFreeFunctions(List<String> freeFunctions) {
+        this.freeFunctions = freeFunctions;
     }
 }

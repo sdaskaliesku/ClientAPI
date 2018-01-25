@@ -10,8 +10,9 @@ $(document).ready(function () {
     var logsContainer = $('#logsContainer');
     var usersContainer = $('#usersContainer');
     var cryptoKeyContainer = $('#cryptoKeyContainer');
+    var freeFunctionsContainer = $('#freeFunctionsContainer');
 
-    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer, usersContainer, cryptoKeyContainer];
+    var containers = [clanContainer, personalContainer, blackListContainer, versionContainer, logsContainer, usersContainer, cryptoKeyContainer, freeFunctionsContainer];
 
     //Initialize validation logic when a form is created
     function formCreated(event, data) {
@@ -308,6 +309,31 @@ $(document).ready(function () {
             },
             cryptoKey: {
                 title: 'Key',
+                inputClass: 'validate[required]'
+            }
+        },
+        formCreated: formCreated,
+        formSubmitting: formSubmitting,
+        formClosed: formClosed
+    });
+
+    freeFunctionsContainer.jtable({
+        jqueryuiTheme: true,
+        ajaxSettings: {type: 'GET'},
+        title: 'Free functions',
+        actions: {
+            listAction: '/crud/freeFunctions/read',
+            createAction: '/crud/freeFunctions/create',
+            updateAction: '/crud/freeFunctions/update',
+            deleteAction: '/crud/freeFunctions/delete'
+        },
+        fields: {
+            id: {
+                title: '#',
+                key: true
+            },
+            name: {
+                title: 'Name',
                 inputClass: 'validate[required]'
             }
         },

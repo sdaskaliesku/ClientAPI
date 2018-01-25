@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="#{view.index.title}">Welcome!</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -38,7 +38,7 @@
             &nbsp;
         </div>
     </th:block>
-    <div class='tab-content' sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
+    <div class='tab-content'>
         <div class='tab-pane' id="clan">
             <div id="clanContainer"></div>
         </div>
@@ -49,22 +49,19 @@
             <div id="blackListContainer"></div>
         </div>
         <div class='tab-pane' id="versions">
-            <div sec:authorize="hasRole('ROLE_ADMIN')">
-                <div id="versionContainer"></div>
-            </div>
+            <div id="versionContainer"></div>
         </div>
         <div class='tab-pane' id="logs">
             <div id="logsContainer"></div>
         </div>
         <div class='tab-pane' id="users">
-            <div sec:authorize="hasRole('ROLE_ADMIN')">
-                <div id="usersContainer"></div>
-            </div>
+            <div id="usersContainer"></div>
         </div>
         <div class='tab-pane' id="cryptoKey">
-            <div sec:authorize="hasRole('ROLE_ADMIN')">
-                <div id="cryptoKeyContainer"></div>
-            </div>
+            <div id="cryptoKeyContainer"></div>
+        </div>
+        <div class='tab-pane' id="freeFunctions">
+            <div id="freeFunctionsContainer"></div>
         </div>
     </div>
 </div>
