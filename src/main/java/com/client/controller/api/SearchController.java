@@ -4,6 +4,7 @@ import com.client.domain.db.ActivateRequest;
 import com.client.domain.responses.Response;
 import com.client.service.ActivateRequestService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +30,13 @@ public class SearchController {
     private static Set<String> getMacAddressList(ActivateRequest request) {
         Set<String> addressSet = new LinkedHashSet<>(request.getMacAdresses());
         addressSet.add(request.getMacAddress());
-        return addressSet;
+        return addressSet.stream().filter(StringUtils::isNotBlank).collect(Collectors.toSet());
     }
 
     private static Set<String> getIpAddressList(ActivateRequest request) {
         Set<String> addressSet = new LinkedHashSet<>(request.getIpAdresses());
         addressSet.add(request.getIpAddress());
-        return addressSet;
+        return addressSet.stream().filter(StringUtils::isNotBlank).collect(Collectors.toSet());
     }
 
     private static Set<ActivateRequest> findIntersections(ActivateRequest base, List<ActivateRequest> requests) {
@@ -69,7 +70,7 @@ public class SearchController {
     @RequestMapping(value = "/nickname", method = RequestMethod.GET)
     public Response byName(@RequestParam String name) {
         List<ActivateRequest> requests = activateRequestService.read();
-        ActivateRequest first = requests.stream().filter(request -> request.getNickName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        ActivateRequest first = requests.stream().filter(request -> StringUtils.equalsIgnoreCase(name, request.getNickName())).findFirst().orElse(null);
         if (Objects.isNull(first)) {
             return new Response();
         }
@@ -81,7 +82,7 @@ public class SearchController {
     @RequestMapping(value = "/clanName", method = RequestMethod.GET)
     public Response byClanName(@RequestParam String name) {
         List<ActivateRequest> requests = activateRequestService.read();
-        Set<ActivateRequest> baseUsers = requests.stream().filter(request -> request.getClanName().equalsIgnoreCase(name)).collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<ActivateRequest> baseUsers = requests.stream().filter(request -> StringUtils.equalsIgnoreCase(name, request.getClanName())).collect(Collectors.toCollection(LinkedHashSet::new));
         if (CollectionUtils.isEmpty(baseUsers)) {
             return new Response();
         }
