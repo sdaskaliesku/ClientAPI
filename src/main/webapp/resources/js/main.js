@@ -239,11 +239,17 @@ $(document).ready(function () {
             clanName: {
                 title: 'Clan name'
             },
-            ipAddress: {
-                title: 'IP address'
+            ipAdresses: {
+                title: 'IP address',
+                display: function (data) {
+                    return data.record.ipAdresses.join(',');
+                }
             },
-            macAddress: {
-                title: 'MAC address'
+            macAdresses: {
+                title: 'MAC address',
+                display: function (data) {
+                    return data.record.macAdresses.join(',');
+                }
             },
             clientVersion: {
                 title: 'Version'
@@ -278,7 +284,7 @@ $(document).ready(function () {
             },
             role: {
                 title: 'Role',
-                options: {'ROLE_ADMIN': 'ROLE_ADMIN', 'ROLE_USER': 'ROLE_USER', 'ROLE_NOTHING': 'ROLE_NOTHING'},
+                options: {'ROLE_ADMIN': 'ROLE_ADMIN', 'ROLE_USER': 'ROLE_USER', 'ROLE_NOTHING': 'ROLE_NOTHING', 'ROLE_READONLY': 'ROLE_READONLY'},
                 inputClass: 'validate[required]'
             }
         },

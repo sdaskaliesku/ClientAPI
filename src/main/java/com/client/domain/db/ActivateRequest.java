@@ -1,10 +1,12 @@
 package com.client.domain.db;
 
 import com.client.domain.enums.AccessType;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.Proxy;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
@@ -13,6 +15,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.StringJoiner;
 
 
 /**
@@ -24,6 +29,7 @@ import java.sql.Date;
 @NamedQueries({
         @NamedQuery(name = ActivateRequest.GET_LOGS, query = "select ar from ActivateRequest ar")
 })
+@Proxy(lazy=false)
 public class ActivateRequest implements Serializable {
 
     public static final String GET_LOGS = "ActivateRequest.getLogs";
@@ -59,9 +65,19 @@ public class ActivateRequest implements Serializable {
     @Transient
     private String millis;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column
+    private Set<String> ipAdresses;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column
+    private Set<String> macAdresses;
+
     public ActivateRequest() {
         this.date = new Date(new java.util.Date().getTime());
         this.millis = String.valueOf(System.currentTimeMillis());
+        ipAdresses = new LinkedHashSet<>();
+        macAdresses = new LinkedHashSet<>();
     }
 
     public Long getId() {
@@ -112,6 +128,22 @@ public class ActivateRequest implements Serializable {
         this.macAddress = macAddress;
     }
 
+    public Set<String> getIpAdresses() {
+        return ipAdresses;
+    }
+
+    public void setIpAdresses(Set<String> ipAdresses) {
+        this.ipAdresses = ipAdresses;
+    }
+
+    public Set<String> getMacAdresses() {
+        return macAdresses;
+    }
+
+    public void setMacAdresses(Set<String> macAdresses) {
+        this.macAdresses = macAdresses;
+    }
+
     public Double getClientVersion() {
         return clientVersion;
     }
@@ -146,17 +178,19 @@ public class ActivateRequest implements Serializable {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
-                .append("id", id)
-                .append("date", date)
-                .append("nickName", nickName)
-                .append("clanName", clanName)
-                .append("ipAddress", ipAddress)
-                .append("macAddress", macAddress)
-                .append("clientVersion", clientVersion)
-                .append("activated", activated)
-                .append("accessType", accessType)
-                .append("millis", millis)
+        return new StringJoiner(", ", ActivateRequest.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("date=" + date)
+                .add("nickName='" + nickName + "'")
+                .add("clanName='" + clanName + "'")
+                .add("ipAddress='" + ipAddress + "'")
+                .add("macAddress='" + macAddress + "'")
+                .add("clientVersion=" + clientVersion)
+                .add("activated=" + activated)
+                .add("accessType=" + accessType)
+                .add("millis='" + millis + "'")
+                .add("ipAdresses=" + ipAdresses)
+                .add("macAdresses=" + macAdresses)
                 .toString();
     }
 }

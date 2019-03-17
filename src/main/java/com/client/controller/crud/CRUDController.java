@@ -41,10 +41,10 @@ public abstract class CRUDController<T> {
     @ResponseBody
     @RequestMapping(value = "/read", method = RequestMethod.GET)
     public Response read() {
-        Response Response = new Response();
+        Response response = new Response();
         List<T> result = service.read();
-        Response.setRecords(result);
-        return Response;
+        response.setRecords(result);
+        return response;
     }
 
     @ResponseBody

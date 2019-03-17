@@ -14,6 +14,7 @@ import com.client.service.CryptoKeyService;
 import com.client.service.FreeFunctionsService;
 import com.client.utils.DateUtils;
 import com.client.utils.EncodeUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import javax.validation.Valid;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -126,9 +128,27 @@ public class AccessListApiController extends ApiController {
     @Override
     public ActivateResponse activate(ActivateRequest activateRequest, HttpServletRequest request) {
         try {
-            activateRequest.setIpAddress(getIpAddress(request));
+            String apiAddress = getIpAddress(request);
+            if (Objects.nonNull(activateRequest)) {
+                if (CollectionUtils.isEmpty(activateRequest.getIpAdresses())) {
+                    activateRequest.setIpAdresses(new LinkedHashSet<>());
+                }
+                activateRequest.getIpAdresses().add(apiAddress);
+            }
         } catch (Exception e) {
-            // do nothing
+            e.printStackTrace();
+        }
+
+        try {
+            if (Objects.nonNull(activateRequest)) {
+                String macAddress = activateRequest.getMacAddress();
+                if (CollectionUtils.isEmpty(activateRequest.getMacAdresses())) {
+                    activateRequest.setMacAdresses(new LinkedHashSet<>());
+                }
+                activateRequest.getMacAdresses().add(macAddress);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         ActivateResponse response = new ActivateResponse();
         try {
