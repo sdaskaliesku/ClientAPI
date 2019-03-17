@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -25,26 +26,41 @@ public class SearchController {
     @Autowired
     ActivateRequestService activateRequestService;
 
-    private static Response buildSearchResponse(ActivateRequest first, List<ActivateRequest> requests) {
+    private static Set<String> getMacAddressList(ActivateRequest request) {
+        Set<String> addressSet = new LinkedHashSet<>(request.getMacAdresses());
+        addressSet.add(request.getMacAddress());
+        return addressSet;
+    }
+
+    private static Set<String> getIpAddressList(ActivateRequest request) {
+        Set<String> addressSet = new LinkedHashSet<>(request.getIpAdresses());
+        addressSet.add(request.getIpAddress());
+        return addressSet;
+    }
+
+    private static Set<ActivateRequest> findIntersections(ActivateRequest base, List<ActivateRequest> requests) {
         Set<ActivateRequest> found = new LinkedHashSet<>();
-        found.add(first);
-        if (Objects.nonNull(first)) {
-            for (ActivateRequest request : requests) {
-                Set<String> macs = new LinkedHashSet<>(request.getMacAdresses());
-                macs.add(request.getMacAddress());
 
-                Set<String> ips = new LinkedHashSet<>(request.getIpAdresses());
-                ips.add(request.getIpAddress());
-
-                boolean hasMac = CollectionUtils.containsAny(macs, first.getMacAdresses());
-                boolean hasIp = CollectionUtils.containsAny(ips, first.getIpAdresses());
+        if (Objects.nonNull(base)) {
+            found.add(base);
+            Set<String> firstMac = getMacAddressList(base);
+            Set<String> firstIps = getIpAddressList(base);
+            requests.forEach(request -> {
+                Set<String> macs = getMacAddressList(request);
+                Set<String> ips = getIpAddressList(request);
+                boolean hasMac = CollectionUtils.containsAny(macs, firstMac);
+                boolean hasIp = CollectionUtils.containsAny(ips, firstIps);
                 if (hasIp || hasMac) {
                     found.add(request);
                 }
-            }
+            });
         }
+        return found;
+    }
+
+    private static Response buildSearchResponse(Collection<ActivateRequest> requests) {
         Response response = new Response();
-        Set<SearchResponse> searchResponses = found.stream().map(SearchResponse::new).collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<SearchResponse> searchResponses = requests.stream().map(SearchResponse::new).collect(Collectors.toCollection(LinkedHashSet::new));
         response.setRecords(searchResponses);
         return response;
     }
@@ -57,18 +73,21 @@ public class SearchController {
         if (Objects.isNull(first)) {
             return new Response();
         }
-        return buildSearchResponse(first, requests);
+        Set<ActivateRequest> set = findIntersections(first, requests);
+        return buildSearchResponse(set);
     }
 
     @ResponseBody
     @RequestMapping(value = "/clanName", method = RequestMethod.GET)
     public Response byClanName(@RequestParam String name) {
         List<ActivateRequest> requests = activateRequestService.read();
-        ActivateRequest first = requests.stream().filter(request -> request.getClanName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (Objects.isNull(first)) {
+        Set<ActivateRequest> baseUsers = requests.stream().filter(request -> request.getClanName().equalsIgnoreCase(name)).collect(Collectors.toCollection(LinkedHashSet::new));
+        if (CollectionUtils.isEmpty(baseUsers)) {
             return new Response();
         }
-        return buildSearchResponse(first, requests);
+        Set<ActivateRequest> responses = new LinkedHashSet<>();
+        baseUsers.stream().map(first -> findIntersections(first, requests)).forEach(responses::addAll);
+        return buildSearchResponse(responses);
     }
 
     public static class SearchResponse {

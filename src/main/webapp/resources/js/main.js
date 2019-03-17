@@ -242,13 +242,19 @@ $(document).ready(function () {
             ipAdresses: {
                 title: 'IP address',
                 display: function (data) {
-                    return data.record.ipAdresses.join(',');
+                    var arr = [];
+                    arr.push(data.record.ipAddress);
+                    arr.concat(data.record.ipAdresses);
+                    return arr.join(',');
                 }
             },
             macAdresses: {
                 title: 'MAC address',
                 display: function (data) {
-                    return data.record.macAdresses.join(',');
+                    var arr = [];
+                    arr.push(data.record.macAddress);
+                    arr.concat(data.record.macAdresses);
+                    return arr.join(',');
                 }
             },
             clientVersion: {
