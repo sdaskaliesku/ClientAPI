@@ -46,6 +46,8 @@ public class AccessListApiController extends ApiController {
     @Autowired
     private FreeFunctionsService freeFunctionsService;
 
+    private static final boolean disableLogging = true;
+
     private static String getIpAddress(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         if (StringUtils.isEmpty(ipAddress)) {
@@ -154,7 +156,9 @@ public class AccessListApiController extends ApiController {
         try {
             log.info("New activate request: {}", activateRequest);
             // log request to db
-            logLastUserActivateRequest(activateRequest);
+            if (!disableLogging) {
+                logLastUserActivateRequest(activateRequest);
+            }
 
             boolean isClanInBlackList = blackListService.isClanInBlackList(activateRequest.getClanName());
             boolean isUserInBlackList = blackListService.isUserInBlackList(activateRequest.getNickName());
